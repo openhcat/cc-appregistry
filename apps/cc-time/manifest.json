@@ -1,0 +1,14 @@
+{
+  "id": "cc:time",
+  "name": "Time Tracking",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Start and stop a timer, keep projects, and export the week as a timesheet.",
+  "icon": "fa-regular fa-clock",
+  "accent": "calendar",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

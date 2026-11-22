@@ -1,0 +1,14 @@
+{
+  "id": "cc:passwords",
+  "name": "Passwords",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "A private vault for logins, with a generator and CSV export.",
+  "icon": "fa-solid fa-key",
+  "accent": "contacts",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

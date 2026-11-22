@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Passwords · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .app { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+      .rail { border-right: 1px solid var(--border); background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+      .rail .brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 15px; }
+      .rail .brand i { color: var(--app-contacts, var(--accent)); }
+      .list { display: flex; flex-direction: column; gap: 3px; overflow: auto; }
+      .row { border: 0; background: none; text-align: left; padding: 8px 10px; border-radius: 9px; cursor: pointer; font: inherit; color: var(--text-2); }
+      .row:hover { background: var(--surface-3); }
+      .row[aria-current='true'] { background: var(--accent-soft); color: var(--accent); }
+      .row b { display: block; font-size: 12.5px; font-weight: 600; }
+      .row span { font-size: 11px; opacity: 0.75; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .pane { padding: 22px 26px 32px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .head h1 { font-size: 19px; margin: 0; letter-spacing: -0.01em; }
+      .head p { margin: 2px 0 0; color: var(--text-3); font-size: 12.5px; }
+      .card { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 16px; }
+      .pw-row { display: flex; gap: 6px; }
+      .pw-row input { font-family: var(--font-mono); }
+      .empty-state { text-align: center; padding: 46px 12px; color: var(--text-3); }
+      .empty-state i { font-size: 26px; display: block; margin-bottom: 10px; opacity: 0.6; }
+      .empty-state p { margin: 0 0 12px; font-size: 13px; }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      @media (max-width: 820px) { .app { grid-template-columns: 1fr; } .rail { border-right: 0; border-bottom: 1px solid var(--border); max-height: 240px; } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="rail">
+        <div class="brand"><i class="fa-solid fa-key"></i> Passwords</div>
+        <button class="btn primary sm" id="new-item"><i class="fa-solid fa-plus"></i> New password</button>
+        <input class="input" id="search" placeholder="Search the vault..." aria-label="Search passwords" />
+        <div class="list" id="list"></div>
+        <span class="grow"></span>
+        <button class="btn quiet sm" id="export"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+        <p class="hint" style="margin:0"><i class="fa-solid fa-lock"></i> Encrypted at rest on Enterprise</p>
+      </aside>
+      <main class="pane" id="pane"></main>
+    </div>
+    <div class="toasts" id="toast-root"></div>
+    <script type="module">
+      const APP = 'cc:passwords';
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let db = { items: [] };
+      let current = '';
+      let query = '';
+      let reveal = false;
+      let timer = null;
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      async function load() {
+        try {
+          const data = await api(`/api/apps/${APP}/storage`);
+          const saved = JSON.parse(data.data?.state || '{}');
+          db = { items: Array.isArray(saved.items) ? saved.items : [] };
+          if (!db.items.some((item) => item.id === current)) current = db.items[0]?.id || '';
+          renderList();
+          renderPane();
+        } catch (error) {
+          if (error.status === 403) return renderConsent();
+          toast(error.message, true);
+        }
+      }
+
+      async function save() {
+        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(db) } });
+      }
+
+      function renderConsent() {
+        $('#pane').innerHTML = `<div class="card empty-state" style="margin:auto">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>Passwords keeps the vault in your CoolCloud account. Allow storage once to start.</p>
+          <button class="btn primary sm" id="grant"><i class="fa-solid fa-check"></i> Allow storage</button>
+        </div>`;
+        $('#grant').addEventListener('click', async () => {
+          try {
+            await api(`/api/apps/${APP}/grants`, { method: 'POST', body: { scopes: ['storage'] } });
+            await load();
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      function generate() {
+        const alphabet = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*+-?';
+        const bytes = crypto.getRandomValues(new Uint8Array(22));
+        return [...bytes].map((byte) => alphabet[byte % alphabet.length]).join('');
+      }
+
+      async function copy(text, label) {
+        try {
+          await navigator.clipboard.writeText(String(text || ''));
+          toast(`${label} copied`);
+        } catch {
+          toast('Copy failed. Select the text instead.', true);
+        }
+      }
+
+      function renderList() {
+        const list = db.items
+          .filter((item) => !query || `${item.title} ${item.username} ${item.category} ${item.url}`.toLowerCase().includes(query))
+          .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+        $('#list').innerHTML = list.length
+          ? list
+              .map(
+                (item) => `<button class="row" data-item="${esc(item.id)}" aria-current="${String(item.id === current)}">
+                  <b>${esc(item.title || 'Untitled')}</b>
+                  <span>${esc(item.username || item.category || 'No username')}</span>
+                </button>`
+              )
+              .join('')
+          : `<p class="hint" style="padding:8px">${query ? 'Nothing matches.' : 'The vault is empty.'}</p>`;
+        $('#list').querySelectorAll('[data-item]').forEach((node) =>
+          node.addEventListener('click', () => {
+            current = node.dataset.item;
+            reveal = false;
+            renderList();
+            renderPane();
+          })
+        );
+      }
+
+      function renderPane() {
+        const item = db.items.find((entry) => entry.id === current);
+        if (!item) {
+          $('#pane').innerHTML = `<div class="card empty-state" style="margin:auto"><i class="fa-solid fa-key"></i><p>Keep logins, API keys and secure notes in one vault.</p><button class="btn primary sm" data-new>Add the first password</button></div>`;
+          $('#pane').querySelector('[data-new]').addEventListener('click', createItem);
+          return;
+        }
+        $('#pane').innerHTML = `
+          <div class="head">
+            <div><h1>${esc(item.title || 'Untitled')}</h1><p>Saved in your account${item.category ? ` · ${esc(item.category)}` : ''}</p></div>
+            <div class="row" style="gap:6px">
+              <button class="btn ghost sm" id="copy-user"><i class="fa-regular fa-copy"></i> Username</button>
+              <button class="btn ghost sm" id="delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+          <div class="card stack-3">
+            <div class="field"><label class="label">Name</label><input class="input" data-field="title" value="${esc(item.title)}" placeholder="GitHub" /></div>
+            <div class="field-row">
+              <div class="field"><label class="label">Username or email</label><input class="input" data-field="username" value="${esc(item.username)}" autocomplete="off" /></div>
+              <div class="field"><label class="label">Folder</label><input class="input" data-field="category" value="${esc(item.category)}" placeholder="Work" /></div>
+            </div>
+            <div class="field">
+              <label class="label">Password</label>
+              <div class="pw-row">
+                <input class="input" data-field="password" type="${reveal ? 'text' : 'password'}" value="${esc(item.password)}" autocomplete="new-password" />
+                <button class="btn quiet sm" id="reveal" aria-label="${reveal ? 'Hide' : 'Show'}">${reveal ? 'Hide' : 'Show'}</button>
+                <button class="btn quiet sm" id="copy-pass" aria-label="Copy password"><i class="fa-regular fa-copy"></i></button>
+                <button class="btn quiet sm" id="roll" aria-label="Generate a new password"><i class="fa-solid fa-dice"></i></button>
+              </div>
+              <span class="hint">Generate a 22-character password with one click.</span>
+            </div>
+            <div class="field"><label class="label">Website</label><input class="input" data-field="url" type="url" value="${esc(item.url)}" placeholder="https://github.com" /></div>
+            <div class="field"><label class="label">Notes</label><textarea class="input" data-field="notes" rows="3">${esc(item.notes)}</textarea></div>
+          </div>`;
+
+        const touch = () => {
+          for (const input of $('#pane').querySelectorAll('[data-field]')) item[input.dataset.field] = input.value;
+          item.updated = new Date().toISOString();
+          clearTimeout(timer);
+          timer = setTimeout(async () => {
+            try {
+              await save();
+              renderList();
+            } catch (error) {
+              toast(error.message, true);
+            }
+          }, 600);
+        };
+        $('#pane').querySelectorAll('[data-field]').forEach((input) => input.addEventListener('input', touch));
+        $('#reveal').addEventListener('click', () => {
+          reveal = !reveal;
+          renderPane();
+        });
+        $('#copy-pass').addEventListener('click', () => copy(item.password, 'Password'));
+        $('#copy-user').addEventListener('click', () => copy(item.username, 'Username'));
+        $('#roll').addEventListener('click', () => {
+          item.password = generate();
+          save().catch((error) => toast(error.message, true));
+          renderPane();
+          toast('New password generated');
+        });
+        $('#delete').addEventListener('click', async () => {
+          if (!confirm(`Delete ${item.title || 'this entry'}?`)) return;
+          db.items = db.items.filter((entry) => entry.id !== item.id);
+          current = db.items[0]?.id || '';
+          await save();
+          renderList();
+          renderPane();
+          toast('Entry deleted');
+        });
+      }
+
+      async function createItem() {
+        const item = { id: uid(), title: 'Untitled', username: '', password: '', url: '', notes: '', category: '', updated: new Date().toISOString() };
+        db.items.push(item);
+        current = item.id;
+        reveal = false;
+        await save();
+        renderList();
+        renderPane();
+        $('#pane').querySelector('[data-field="title"]')?.select();
+      }
+
+      function csv() {
+        const cell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+        const rows = [['name', 'username', 'password', 'url', 'folder', 'notes']];
+        for (const item of db.items) rows.push([item.title, item.username, item.password, item.url, item.category, item.notes]);
+        const blob = new Blob(['\ufeff' + rows.map((row) => row.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `passwords-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        toast('CSV exported — keep it somewhere safe');
+      }
+
+      $('#new-item').addEventListener('click', createItem);
+      $('#search').addEventListener('input', (event) => {
+        query = event.target.value.trim().toLowerCase();
+        renderList();
+      });
+      $('#export').addEventListener('click', csv);
+      load();
+    </script>
+  </body>
+</html>

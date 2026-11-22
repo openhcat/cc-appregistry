@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Time Tracking · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .page { max-width: 1020px; margin: 0 auto; padding: 22px 22px 40px; display: flex; flex-direction: column; gap: 14px; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .head h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+      .head p { margin: 2px 0 0; color: var(--text-3); font-size: 12.5px; }
+      .timer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 14px 16px; }
+      .timer .clock { font-family: var(--font-mono); font-size: 26px; font-weight: 650; letter-spacing: 0.02em; min-width: 110px; }
+      .timer.running { border-color: var(--accent-line); background: var(--accent-soft); }
+      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+      .stat { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 12px 14px; }
+      .stat span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+      .stat b { font-size: 20px; letter-spacing: -0.01em; }
+      .cols { display: grid; grid-template-columns: 1fr 300px; gap: 14px; align-items: start; }
+      .card { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 14px; }
+      .card h2 { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-3); }
+      .entry { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+      .entry:last-child { border-bottom: 0; }
+      .entry .when { color: var(--text-3); font-size: 11px; min-width: 92px; }
+      .entry .what { flex: 1; min-width: 0; }
+      .entry .what b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .entry .what span { color: var(--text-3); font-size: 11px; }
+      .entry .dur { font-family: var(--font-mono); }
+      .project { display: flex; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+      .project:last-child { border-bottom: 0; }
+      .project .grow b { display: block; }
+      .project .grow span { font-size: 11px; color: var(--text-3); }
+      .empty-state { text-align: center; padding: 36px 12px; color: var(--text-3); }
+      .empty-state i { font-size: 24px; display: block; margin-bottom: 9px; opacity: 0.6; }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      .sheet { position: fixed; inset: 0; background: rgba(6, 18, 30, 0.4); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 80; }
+      .sheet-card { background: var(--panel-strong); border: 1px solid var(--panel-border); border-radius: 14px; box-shadow: var(--shadow-md); width: min(460px, 100%); padding: 18px; }
+      .sheet-card h2 { margin: 0 0 12px; font-size: 16px; }
+      @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="head">
+        <div><h1>Time Tracking</h1><p>Start a timer, stop it when you are done, and export the week.</p></div>
+        <button class="btn quiet sm" id="export"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+      </div>
+      <div class="timer" id="timer">
+        <span class="clock" id="clock">0:00:00</span>
+        <select class="select" id="project" aria-label="Project" style="max-width:220px"></select>
+        <input class="input" id="note" placeholder="What are you working on?" aria-label="Note" style="flex:1;min-width:150px" />
+        <button class="btn primary" id="toggle"><i class="fa-solid fa-play"></i> Start</button>
+        <button class="btn quiet" id="manual"><i class="fa-solid fa-plus"></i> Manual entry</button>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="cols">
+        <section class="card">
+          <h2>Recent entries</h2>
+          <div id="entries"></div>
+        </section>
+        <section class="card">
+          <h2>Projects</h2>
+          <div id="projects"></div>
+          <button class="btn quiet sm" id="new-project" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add project</button>
+        </section>
+      </div>
+    </div>
+    <div class="toasts" id="toast-root"></div>
+    <script type="module">
+      const APP = 'cc:time';
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const pad = (value) => String(value).padStart(2, '0');
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let db = { projects: [], entries: [], running: null };
+      let tick = null;
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      const clock = (ms) => {
+        const total = Math.max(0, Math.floor(ms / 1000));
+        return `${Math.floor(total / 3600)}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
+      };
+      const short = (ms) => {
+        const minutes = Math.round(ms / 60000);
+        return `${Math.floor(minutes / 60)}h ${pad(minutes % 60)}m`;
+      };
+      const hours = (ms) => ms / 3600000;
+      const dayStart = (date = new Date()) => {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        return start;
+      };
+      const weekStart = () => {
+        const start = dayStart();
+        const offset = (start.getDay() + 6) % 7;
+        start.setDate(start.getDate() - offset);
+        return start;
+      };
+
+      async function load() {
+        try {
+          const data = await api(`/api/apps/${APP}/storage`);
+          const saved = JSON.parse(data.data?.state || '{}');
+          db = {
+            projects: Array.isArray(saved.projects) ? saved.projects : [],
+            entries: Array.isArray(saved.entries) ? saved.entries : [],
+            running: saved.running && saved.running.start ? saved.running : null
+          };
+          if (!db.projects.length) {
+            db.projects.push({ id: uid(), name: 'General', client: '', rate: 0 });
+            await save();
+          }
+          render();
+        } catch (error) {
+          if (error.status === 403) return renderConsent();
+          toast(error.message, true);
+        }
+      }
+
+      async function save() {
+        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(db) } });
+      }
+
+      function renderConsent() {
+        $('#entries').innerHTML = `<div class="empty-state">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>Time entries live in your CoolCloud account. Allow storage once to start.</p>
+          <button class="btn primary sm" id="grant"><i class="fa-solid fa-check"></i> Allow storage</button>
+        </div>`;
+        $('#grant').addEventListener('click', async () => {
+          try {
+            await api(`/api/apps/${APP}/grants`, { method: 'POST', body: { scopes: ['storage'] } });
+            await load();
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      function render() {
+        $('#project').innerHTML = db.projects
+          .map((project) => `<option value="${esc(project.id)}" ${db.running?.projectId === project.id ? 'selected' : ''}>${esc(project.name)}${project.client ? ` · ${esc(project.client)}` : ''}</option>`)
+          .join('');
+        $('#project').disabled = Boolean(db.running);
+        $('#note').value = db.running?.note || '';
+        $('#note').disabled = Boolean(db.running);
+        const running = Boolean(db.running);
+        $('#timer').classList.toggle('running', running);
+        $('#toggle').innerHTML = running ? '<i class="fa-solid fa-stop"></i> Stop' : '<i class="fa-solid fa-play"></i> Start';
+        $('#toggle').className = `btn ${running ? 'danger' : 'primary'}`;
+
+        const now = Date.now();
+        const today = db.entries.filter((entry) => new Date(entry.end) >= dayStart());
+        const week = db.entries.filter((entry) => new Date(entry.end) >= weekStart());
+        const value = week.reduce((sum, entry) => {
+          const project = db.projects.find((item) => item.id === entry.projectId);
+          return sum + hours(new Date(entry.end) - new Date(entry.start)) * Number(project?.rate || 0);
+        }, 0);
+        $('#stats').innerHTML = `
+          <div class="stat"><span>Today</span><b>${short(today.reduce((sum, entry) => sum + (new Date(entry.end) - new Date(entry.start)), 0))}</b></div>
+          <div class="stat"><span>This week</span><b>${short(week.reduce((sum, entry) => sum + (new Date(entry.end) - new Date(entry.start)), 0))}</b></div>
+          <div class="stat"><span>Week value</span><b>$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b></div>
+          <div class="stat"><span>Entries</span><b>${db.entries.length}</b></div>`;
+
+        const entries = [...db.entries].sort((a, b) => String(b.end).localeCompare(String(a.end))).slice(0, 40);
+        $('#entries').innerHTML = entries.length
+          ? entries
+              .map((entry) => {
+                const project = db.projects.find((item) => item.id === entry.projectId);
+                const date = new Date(entry.end);
+                return `<div class="entry">
+                  <span class="when">${esc(date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }))}</span>
+                  <div class="what"><b>${esc(project?.name || 'Project')}</b><span>${esc(entry.note || project?.client || '')}</span></div>
+                  <span class="dur">${clock(new Date(entry.end) - new Date(entry.start))}</span>
+                  <button class="btn ghost icon sm" data-del="${esc(entry.id)}" aria-label="Delete entry"><i class="fa-solid fa-xmark"></i></button>
+                </div>`;
+              })
+              .join('')
+          : `<div class="empty-state"><i class="fa-regular fa-clock"></i><p>No time recorded yet. Start the timer above.</p></div>`;
+
+        $('#entries').querySelectorAll('[data-del]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            db.entries = db.entries.filter((entry) => entry.id !== node.dataset.del);
+            await save();
+            render();
+            toast('Entry removed');
+          })
+        );
+
+        $('#projects').innerHTML = db.projects
+          .map(
+            (project) => `<div class="project">
+              <div class="grow"><b>${esc(project.name)}</b><span>${esc(project.client || 'No client')}${Number(project.rate) ? ` · $${Number(project.rate)}/h` : ''}</span></div>
+              <button class="btn ghost icon sm" data-project="${esc(project.id)}" aria-label="Edit project"><i class="fa-solid fa-pen"></i></button>
+              ${db.projects.length > 1 ? `<button class="btn ghost icon sm" data-project-del="${esc(project.id)}" aria-label="Delete project"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            </div>`
+          )
+          .join('');
+
+        $('#projects').querySelectorAll('[data-project]').forEach((node) => node.addEventListener('click', () => projectForm(node.dataset.project)));
+        $('#projects').querySelectorAll('[data-project-del]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            if (db.running?.projectId === node.dataset.projectDel) return toast('Stop the timer first', true);
+            db.projects = db.projects.filter((project) => project.id !== node.dataset.projectDel);
+            await save();
+            render();
+          })
+        );
+
+        if (db.running) {
+          clearInterval(tick);
+          tick = setInterval(() => {
+            $('#clock').textContent = clock(Date.now() - new Date(db.running.start).getTime());
+          }, 1000);
+          $('#clock').textContent = clock(now - new Date(db.running.start).getTime());
+        } else {
+          clearInterval(tick);
+          $('#clock').textContent = '0:00:00';
+        }
+      }
+
+      async function toggle() {
+        if (db.running) {
+          const end = new Date().toISOString();
+          const ms = new Date(end) - new Date(db.running.start);
+          if (ms > 30000) {
+            db.entries.push({
+              id: uid(),
+              projectId: db.running.projectId,
+              start: db.running.start,
+              end,
+              note: db.running.note || ''
+            });
+          }
+          db.running = null;
+          await save();
+          render();
+          toast(ms > 30000 ? `Saved ${short(ms)}` : 'Timer stopped');
+          return;
+        }
+        const projectId = $('#project').value || db.projects[0]?.id;
+        if (!projectId) return toast('Add a project first', true);
+        db.running = { projectId, start: new Date().toISOString(), note: $('#note').value.trim() };
+        await save();
+        render();
+      }
+
+      function projectForm(id) {
+        const project = db.projects.find((item) => item.id === id) || { name: '', client: '', rate: 0 };
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet';
+        sheet.innerHTML = `<div class="sheet-card">
+          <h2>${id ? 'Edit project' : 'New project'}</h2>
+          <form class="stack-3">
+            <div class="field"><label class="label">Name</label><input class="input" name="name" required value="${esc(project.name)}" placeholder="Website redesign" /></div>
+            <div class="field"><label class="label">Client</label><input class="input" name="client" value="${esc(project.client)}" placeholder="Acme" /></div>
+            <div class="field"><label class="label">Hourly rate</label><input class="input" name="rate" type="number" min="0" step="1" value="${esc(project.rate || '')}" placeholder="0" /></div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+              <button type="button" class="btn ghost" data-cancel>Cancel</button>
+              <button type="submit" class="btn primary">${id ? 'Save' : 'Add project'}</button>
+            </div>
+          </form>
+        </div>`;
+        document.body.appendChild(sheet);
+        const close = () => sheet.remove();
+        sheet.addEventListener('click', (event) => {
+          if (event.target === sheet) close();
+        });
+        sheet.querySelector('[data-cancel]').addEventListener('click', close);
+        sheet.querySelector('form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const data = Object.fromEntries(new FormData(event.target).entries());
+          data.rate = Number(data.rate) || 0;
+          if (id) Object.assign(project, data);
+          else db.projects.push({ id: uid(), ...data });
+          await save();
+          close();
+          render();
+        });
+        sheet.querySelector('input[name="name"]').focus();
+      }
+
+      function manualForm() {
+        const now = new Date();
+        const start = new Date(now.getTime() - 60 * 60 * 1000);
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet';
+        sheet.innerHTML = `<div class="sheet-card">
+          <h2>Manual entry</h2>
+          <form class="stack-3">
+            <div class="field"><label class="label">Project</label><select class="select" name="projectId">${db.projects
+              .map((project) => `<option value="${esc(project.id)}">${esc(project.name)}</option>`)
+              .join('')}</select></div>
+            <div class="field-row">
+              <div class="field"><label class="label">From</label><input class="input" name="start" type="datetime-local" value="${new Date(start.getTime() - start.getTimezoneOffset() * 60000).toISOString().slice(0, 16)}" required /></div>
+              <div class="field"><label class="label">To</label><input class="input" name="end" type="datetime-local" value="${new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16)}" required /></div>
+            </div>
+            <div class="field"><label class="label">Note</label><input class="input" name="note" placeholder="What did you do?" /></div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+              <button type="button" class="btn ghost" data-cancel>Cancel</button>
+              <button type="submit" class="btn primary">Add entry</button>
+            </div>
+          </form>
+        </div>`;
+        document.body.appendChild(sheet);
+        const close = () => sheet.remove();
+        sheet.addEventListener('click', (event) => {
+          if (event.target === sheet) close();
+        });
+        sheet.querySelector('[data-cancel]').addEventListener('click', close);
+        sheet.querySelector('form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const data = Object.fromEntries(new FormData(event.target).entries());
+          const from = new Date(data.start);
+          const to = new Date(data.end);
+          if (!(from < to)) return toast('The end must be after the start', true);
+          db.entries.push({ id: uid(), projectId: data.projectId, start: from.toISOString(), end: to.toISOString(), note: data.note });
+          await save();
+          close();
+          render();
+          toast('Entry added');
+        });
+      }
+
+      function csv() {
+        const cell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+        const rows = [['date', 'project', 'client', 'note', 'hours', 'rate', 'amount']];
+        for (const entry of db.entries) {
+          const project = db.projects.find((item) => item.id === entry.projectId);
+          const duration = hours(new Date(entry.end) - new Date(entry.start));
+          rows.push([
+            new Date(entry.end).toISOString().slice(0, 10),
+            project?.name || '',
+            project?.client || '',
+            entry.note,
+            duration.toFixed(2),
+            project?.rate || 0,
+            (duration * Number(project?.rate || 0)).toFixed(2)
+          ]);
+        }
+        const blob = new Blob(['\ufeff' + rows.map((row) => row.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `timesheet-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        toast('Timesheet exported');
+      }
+
+      $('#toggle').addEventListener('click', toggle);
+      $('#new-project').addEventListener('click', () => projectForm());
+      $('#manual').addEventListener('click', manualForm);
+      $('#export').addEventListener('click', csv);
+      load();
+    </script>
+  </body>
+</html>

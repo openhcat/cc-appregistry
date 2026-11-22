@@ -1,0 +1,14 @@
+{
+  "id": "cc:forms",
+  "name": "Forms",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Build a form, share a public link, and collect answers in CoolCloud.",
+  "icon": "fa-solid fa-clipboard-list",
+  "accent": "projects",
+  "category": "Business",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

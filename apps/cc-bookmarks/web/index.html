@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bookmarks · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .page { max-width: 980px; margin: 0 auto; padding: 22px 22px 40px; display: flex; flex-direction: column; gap: 14px; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .head h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+      .head p { margin: 2px 0 0; color: var(--text-3); font-size: 12.5px; }
+      .tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+      .tag { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 10px; font-size: 11.5px; cursor: pointer; color: var(--text-2); }
+      .tag[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+      .link-card { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 13px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+      .link-card a { font-weight: 600; font-size: 13px; color: var(--accent); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .link-card a:hover { text-decoration: underline; }
+      .link-card .url { font-size: 11px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .link-card p { margin: 0; font-size: 12px; color: var(--text-2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+      .link-card .foot { display: flex; gap: 4px; align-items: center; margin-top: auto; padding-top: 6px; }
+      .empty-state { text-align: center; padding: 50px 12px; color: var(--text-3); border: 1px dashed var(--border); border-radius: 14px; }
+      .empty-state i { font-size: 26px; display: block; margin-bottom: 10px; opacity: 0.6; }
+      .empty-state p { margin: 0 0 12px; font-size: 13px; }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      .sheet { position: fixed; inset: 0; background: rgba(6, 18, 30, 0.4); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 80; }
+      .sheet-card { background: var(--panel-strong); border: 1px solid var(--panel-border); border-radius: 14px; box-shadow: var(--shadow-md); width: min(460px, 100%); padding: 18px; }
+      .sheet-card h2 { margin: 0 0 12px; font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="head">
+        <div><h1>Bookmarks</h1><p>A link shelf for the pages you keep coming back to.</p></div>
+        <div class="tools">
+          <input class="input" id="search" placeholder="Search bookmarks..." aria-label="Search bookmarks" style="width:220px" />
+          <button class="btn primary sm" id="new"><i class="fa-solid fa-plus"></i> New bookmark</button>
+        </div>
+      </div>
+      <div class="tags" id="tags"></div>
+      <div class="grid" id="grid"><div class="skeleton" style="height:120px"></div></div>
+    </div>
+    <div class="toasts" id="toast-root"></div>
+    <script type="module">
+      const APP = 'cc:bookmarks';
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let db = { items: [] };
+      let query = '';
+      let tag = '';
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      async function load() {
+        try {
+          const data = await api(`/api/apps/${APP}/storage`);
+          const saved = JSON.parse(data.data?.state || '{}');
+          db = { items: Array.isArray(saved.items) ? saved.items : [] };
+          render();
+        } catch (error) {
+          if (error.status === 403) return renderConsent();
+          toast(error.message, true);
+        }
+      }
+
+      async function save() {
+        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(db) } });
+      }
+
+      function renderConsent() {
+        $('#grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>Bookmarks are stored in your CoolCloud account. Allow storage once to start.</p>
+          <button class="btn primary sm" id="grant"><i class="fa-solid fa-check"></i> Allow storage</button>
+        </div>`;
+        $('#grant').addEventListener('click', async () => {
+          try {
+            await api(`/api/apps/${APP}/grants`, { method: 'POST', body: { scopes: ['storage'] } });
+            await load();
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      function tags() {
+        return [...new Set(db.items.flatMap((item) => String(item.tags || '').split(',').map((value) => value.trim()).filter(Boolean)))].sort();
+        }
+
+      function render() {
+        const all = tags();
+        $('#tags').innerHTML = all.length
+          ? `<button class="tag" data-tag="" aria-pressed="${String(!tag)}">All</button>${all
+              .map((name) => `<button class="tag" data-tag="${esc(name)}" aria-pressed="${String(tag === name)}">${esc(name)}</button>`)
+              .join('')}`
+          : '';
+        $('#tags').querySelectorAll('[data-tag]').forEach((node) =>
+          node.addEventListener('click', () => {
+            tag = node.dataset.tag;
+            render();
+          })
+        );
+
+        const list = db.items
+          .filter((item) => !tag || String(item.tags || '').split(',').map((value) => value.trim()).includes(tag))
+          .filter((item) => !query || `${item.title} ${item.url} ${item.description} ${item.tags}`.toLowerCase().includes(query))
+          .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+
+        $('#grid').innerHTML = list.length
+          ? list
+              .map(
+                (item) => `<article class="link-card">
+                  <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">${esc(item.title || item.url)}</a>
+                  <span class="url">${esc(item.url)}</span>
+                  ${item.description ? `<p>${esc(item.description)}</p>` : ''}
+                  <div class="foot">
+                    ${String(item.tags || '')
+                      .split(',')
+                      .map((value) => value.trim())
+                      .filter(Boolean)
+                      .map((value) => `<span class="tag" style="cursor:default">${esc(value)}</span>`)
+                      .join('')}
+                    <span class="grow"></span>
+                    <button class="btn ghost icon sm" data-edit="${esc(item.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn ghost icon sm" data-delete="${esc(item.id)}" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                  </div>
+                </article>`
+              )
+              .join('')
+          : `<div class="empty-state" style="grid-column:1/-1"><i class="fa-regular fa-bookmark"></i><p>${
+              query || tag ? 'Nothing matches that filter.' : 'No bookmarks yet. Save the first link.'
+            }</p>${query || tag ? '' : '<button class="btn primary sm" data-new>Add a bookmark</button>'}</div>`;
+
+        $('#grid').querySelectorAll('[data-edit]').forEach((node) => node.addEventListener('click', () => form(node.dataset.edit)));
+        $('#grid').querySelectorAll('[data-delete]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            const item = db.items.find((entry) => entry.id === node.dataset.delete);
+            if (!item || !confirm(`Delete ${item.title || item.url}?`)) return;
+            db.items = db.items.filter((entry) => entry.id !== item.id);
+            await save();
+            render();
+            toast('Bookmark deleted');
+          })
+        );
+        $('#grid').querySelector('[data-new]')?.addEventListener('click', () => form());
+      }
+
+      function form(id) {
+        const item = db.items.find((entry) => entry.id === id) || { title: '', url: '', description: '', tags: '' };
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet';
+        sheet.innerHTML = `<div class="sheet-card">
+          <h2>${id ? 'Edit bookmark' : 'New bookmark'}</h2>
+          <form class="stack-3">
+            <div class="field"><label class="label">Address</label><input class="input" name="url" type="url" required value="${esc(item.url)}" placeholder="https://example.com" /></div>
+            <div class="field"><label class="label">Title</label><input class="input" name="title" value="${esc(item.title)}" placeholder="Example" /></div>
+            <div class="field"><label class="label">Description</label><textarea class="input" name="description" rows="2">${esc(item.description)}</textarea></div>
+            <div class="field"><label class="label">Tags</label><input class="input" name="tags" value="${esc(item.tags)}" placeholder="work, reading" /><span class="hint">Comma separated.</span></div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+              <button type="button" class="btn ghost" data-cancel>Cancel</button>
+              <button type="submit" class="btn primary">${id ? 'Save' : 'Add bookmark'}</button>
+            </div>
+          </form>
+        </div>`;
+        document.body.appendChild(sheet);
+        const close = () => sheet.remove();
+        sheet.addEventListener('click', (event) => {
+          if (event.target === sheet) close();
+        });
+        sheet.querySelector('[data-cancel]').addEventListener('click', close);
+        sheet.querySelector('form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const data = Object.fromEntries(new FormData(event.target).entries());
+          if (!/^https?:\/\//i.test(data.url)) {
+            data.url = `https://${data.url}`;
+          }
+          if (id) Object.assign(item, data);
+          else db.items.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
+          try {
+            await save();
+            close();
+            render();
+            toast(id ? 'Bookmark saved' : 'Bookmark added');
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+        sheet.querySelector('input[name="url"]').focus();
+      }
+
+      $('#new').addEventListener('click', () => form());
+      $('#search').addEventListener('input', (event) => {
+        query = event.target.value.trim().toLowerCase();
+        render();
+      });
+      load();
+    </script>
+  </body>
+</html>

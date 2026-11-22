@@ -1,0 +1,14 @@
+{
+  "id": "cc:wiki",
+  "name": "Wiki",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Markdown pages in Files/Wiki, with a live preview and a shared folder.",
+  "icon": "fa-solid fa-book-open",
+  "accent": "editor",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["files:read", "files:write"],
+  "website": "https://coolcloud.odoo.com"
+}

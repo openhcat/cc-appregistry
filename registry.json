@@ -335,6 +335,116 @@
         "markdown",
         "writing"
       ]
+    },
+    {
+      "id": "cc:passwords",
+      "name": "Passwords",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "A private vault for logins, with a generator and CSV export.",
+      "icon": "fa-solid fa-key",
+      "accent": "contacts",
+      "category": "Productivity",
+      "runtime": "external",
+      "path": "apps/cc-passwords",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "passwords",
+        "vault",
+        "security"
+      ]
+    },
+    {
+      "id": "cc:bookmarks",
+      "name": "Bookmarks",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "A shared shelf for links, with tags, notes and search.",
+      "icon": "fa-regular fa-bookmark",
+      "accent": "tasks",
+      "category": "Productivity",
+      "runtime": "external",
+      "path": "apps/cc-bookmarks",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "bookmarks",
+        "links",
+        "reading"
+      ]
+    },
+    {
+      "id": "cc:time",
+      "name": "Time Tracking",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Start and stop a timer, keep projects, and export the week as a timesheet.",
+      "icon": "fa-regular fa-clock",
+      "accent": "calendar",
+      "category": "Productivity",
+      "runtime": "external",
+      "path": "apps/cc-time",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "time",
+        "timesheet",
+        "billing"
+      ]
+    },
+    {
+      "id": "cc:wiki",
+      "name": "Wiki",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Markdown pages in Files/Wiki, with a live preview and a shared folder.",
+      "icon": "fa-solid fa-book-open",
+      "accent": "editor",
+      "category": "Productivity",
+      "runtime": "external",
+      "path": "apps/cc-wiki",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "wiki",
+        "markdown",
+        "knowledge"
+      ]
+    },
+    {
+      "id": "cc:forms",
+      "name": "Forms",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Build a form, share a public link, and collect answers in CoolCloud.",
+      "icon": "fa-solid fa-clipboard-list",
+      "accent": "projects",
+      "category": "Business",
+      "runtime": "external",
+      "path": "apps/cc-forms",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "forms",
+        "surveys",
+        "responses"
+      ]
     }
   ]
 }

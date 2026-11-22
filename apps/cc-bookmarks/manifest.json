@@ -1,0 +1,14 @@
+{
+  "id": "cc:bookmarks",
+  "name": "Bookmarks",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "A shared shelf for links, with tags, notes and search.",
+  "icon": "fa-regular fa-bookmark",
+  "accent": "tasks",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}
