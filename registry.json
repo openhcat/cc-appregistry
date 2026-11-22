@@ -2,7 +2,7 @@
   "schema": "coolcloud.registry/2",
   "name": "Official CoolCloud App Registry",
   "official": true,
-  "description": "The apps CoolCloud installs by default, plus community apps published to the registry. Every entry names a git repository and the folder inside it.",
+  "description": "The apps CoolCloud installs by default, plus community apps published to the registry. Every entry names the folder that holds its manifest, the files an installer downloads, and optionally its own git repository.",
   "homepage": "https://openhcat.github.io/cc-appregistry/",
   "publishGuide": "https://openhcat.github.io/cc-appregistry/publish.html",
   "maintainer": "openhcat",

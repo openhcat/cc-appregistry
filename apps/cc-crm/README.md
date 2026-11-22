@@ -1,18 +1,16 @@
 # cc-crm
 
-A CoolCloud Community app published through the [Official App Registry](../registry.json).
+The Community CRM, published through the [Official App Registry](../registry.json).
 
-This Community edition is deliberately focused:
-
-- CRM: a contacts book (people, companies, email, phone, notes). No pipeline.
-- Finance: invoices (client, amount, dates, status). No expenses or cash reports.
-
-CoolCloud Enterprise ships fuller variants of these apps with a deal
-pipeline, forecasting, expenses, recurring invoices and CSV export.
+Community keeps this app deliberately focused: a contacts book of people and
+companies with email, phone and notes. There is no deal pipeline.
 
 - Entry point: `web/index.html` (single-file app, no build step)
 - Stores data with the `storage` app API, per user
 - Reuses the CoolCloud design system stylesheets from `/css/`
+
+CoolCloud Enterprise ships a fuller CRM under the same id — contacts plus a
+five-stage pipeline, weighted forecast and CSV export.
 
 Install: Admin → App Store → Explore → Official App Registry, or
 `coolcloud --install cc-crm`

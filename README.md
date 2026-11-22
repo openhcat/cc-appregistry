@@ -1,6 +1,6 @@
 # Official CoolCloud App Registry
 
-The registry CoolCloud installs its apps from. One JSON file lists every app; each entry points at a repository and the folder inside it that holds `manifest.json`.
+The registry CoolCloud installs its apps from. One JSON file lists every app; each entry names the folder that holds `manifest.json`, the files an installer downloads, and optionally its own git repository.
 
 - **Browse:** https://openhcat.github.io/cc-appregistry/
 - **Registry file:** [`registry.json`](registry.json) — `https://raw.githubusercontent.com/openhcat/cc-appregistry/main/registry.json`
@@ -17,14 +17,14 @@ The registry CoolCloud installs its apps from. One JSON file lists every app; ea
       "id": "cc:crm",
       "name": "CRM",
       "developer": "cc",
-      "version": "1.0.0",
-      "description": "Contacts, companies and a deal pipeline that lives in your own cloud.",
+      "version": "1.1.0",
+      "description": "A focused contacts book for people and companies, kept in your account.",
       "icon": "fa-solid fa-handshake",
       "category": "Business",
       "runtime": "external",
       "path": "apps/cc-crm",
       "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["crm", "contacts", "pipeline"]
+      "tags": ["crm", "contacts", "address book"]
     }
   ]
 }
@@ -35,6 +35,7 @@ The registry CoolCloud installs its apps from. One JSON file lists every app; ea
 | Folder | Contents |
 | --- | --- |
 | `apps/cc-*` | App packages: core app manifests, and the full source of the Essentials Pack apps |
+| `scripts/validate.mjs` | Checks every entry, manifest and listed file before a pull request |
 | `assets/` | Stylesheet and browser script for the GitHub Pages catalogue |
 | `index.html` | The browse page — categories, search, install commands |
 | `publish.html` | The publishing guide |

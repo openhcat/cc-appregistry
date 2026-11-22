@@ -96,7 +96,11 @@ Open it from **All apps**. Check light and dark, a narrow window, the permission
 
 ## 6. Publish to this registry
 
-Add your app object to `apps` in `registry.json` and open a pull request:
+Add your app object to `apps` in `registry.json`, run the registry check, and open a pull request:
+
+```
+node scripts/validate.mjs --remote
+```
 
 ```json
 {
