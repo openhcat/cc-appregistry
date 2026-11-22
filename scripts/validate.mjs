@@ -67,9 +67,11 @@ for (const entry of registry.apps || []) {
   if (seen.has(entry.id)) fail(`${label}: duplicate id`);
   seen.add(entry.id);
 
-  for (const field of ['name', 'developer', 'version', 'description', 'icon', 'path']) {
+  for (const field of ['name', 'developer', 'version', 'description', 'icon']) {
     if (!entry[field]) fail(`${label}: ${field} is required`);
   }
+  if (!entry.enterprise && !entry.path) fail(`${label}: path is required`);
+  if (entry.enterprise && !entry.contact) fail(`${label}: enterprise entries need a contact URL`);
   if (entry.developer && entry.id && entry.id.split(':')[0] !== entry.developer) {
     fail(`${label}: developer must match the id prefix`);
   }
@@ -78,6 +80,10 @@ for (const entry of registry.apps || []) {
   }
   if (!/^\d+\.\d+\.\d+$/.test(String(entry.version || ''))) fail(`${label}: version must be semver`);
   if (entry.category && !categories.has(entry.category)) fail(`${label}: category "${entry.category}" is not listed`);
+
+  /* Enterprise-only apps are catalogue entries: the code ships with the
+     commercial edition and is not downloadable from this public registry. */
+  if (entry.enterprise) continue;
 
   const files = Array.isArray(entry.files) ? entry.files : [];
   if (!files.includes('manifest.json')) fail(`${label}: files must include manifest.json`);

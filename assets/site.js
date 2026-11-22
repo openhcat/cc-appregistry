@@ -47,15 +47,23 @@ function render() {
             <p>${escapeHtml(app.description || '')}</p>
             <div class="foot">
               ${app.category ? `<span class="badge">${escapeHtml(app.category)}</span>` : ''}
-              ${app.runtime === 'core' ? '<span class="badge core">core</span>' : '<span class="badge">app</span>'}
+              ${app.enterprise ? '<span class="badge enterprise">enterprise only</span>' : app.runtime === 'core' ? '<span class="badge core">core</span>' : '<span class="badge">app</span>'}
               ${app.essentials ? '<span class="badge essential">essentials</span>' : ''}
               ${app.beta ? '<span class="badge">beta</span>' : ''}
             </div>
-            <div class="code">coolcloud --install ${escapeHtml(app.id)}</div>
+            ${
+              app.enterprise
+                ? `<div class="code">Ships with CoolCloud Enterprise</div>
+            <div class="foot">
+              <a class="copy" style="text-decoration:none" href="${escapeHtml(app.contact || 'https://coolcloud.odoo.com/contactus')}" target="_blank" rel="noopener noreferrer">Contact us</a>
+              <a class="copy" style="text-decoration:none" href="https://coolcloud.odoo.com" target="_blank" rel="noopener noreferrer">Get Enterprise</a>
+            </div>`
+                : `<div class="code">coolcloud --install ${escapeHtml(app.id)}</div>
             <div class="foot">
               <button class="copy" data-copy="coolcloud --install ${escapeHtml(app.id)}">Copy install</button>
               <a class="copy" style="text-decoration:none" href="https://github.com/openhcat/cc-appregistry/tree/main/${escapeHtml(app.path || '')}" target="_blank" rel="noopener noreferrer">Source</a>
-            </div>
+            </div>`
+            }
           </article>`
         )
         .join('')

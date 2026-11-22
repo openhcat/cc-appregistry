@@ -2,6 +2,8 @@
 
 The registry CoolCloud installs its apps from. One JSON file lists every app; each entry names the folder that holds `manifest.json`, the files an installer downloads, and optionally its own git repository.
 
+> **Get Enterprise for more apps.** Entries marked **ENTERPRISE ONLY** are catalogue listings: their code ships with [CoolCloud Enterprise](https://coolcloud.odoo.com/contactus), not with this public registry.
+
 - **Browse:** https://openhcat.github.io/cc-appregistry/
 - **Registry file:** [`registry.json`](registry.json) — `https://raw.githubusercontent.com/openhcat/cc-appregistry/main/registry.json`
 - **Publishing guide:** https://openhcat.github.io/cc-appregistry/publish.html

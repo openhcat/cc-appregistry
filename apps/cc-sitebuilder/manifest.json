@@ -1,0 +1,15 @@
+{
+  "id": "cc:sitebuilder",
+  "name": "Website Builder",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Drag blocks into a one-page site, publish it in CoolCloud, and export clean HTML.",
+  "icon": "fa-solid fa-layer-group",
+  "accent": "studio",
+  "category": "Business",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "minVersion": "2.0.0",
+  "website": "https://coolcloud.odoo.com"
+}

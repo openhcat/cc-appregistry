@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Website Builder · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .app { display: grid; grid-template-columns: 190px minmax(0, 1fr) 280px; min-height: 100vh; }
+      .palette, .inspector { background: var(--surface); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: auto; }
+      .palette { border-right: 1px solid var(--border); }
+      .inspector { border-left: 1px solid var(--border); }
+      .palette h2, .inspector h2 { margin: 0 0 4px; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+      .palette button { justify-content: flex-start; }
+      .canvas-wrap { min-width: 0; display: flex; flex-direction: column; }
+      .bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; background: var(--surface); }
+      .bar input.site-title { flex: 1; min-width: 140px; font-size: 16px; font-weight: 650; border: 0; background: transparent; padding: 4px; color: var(--text); }
+      .bar input.site-title:focus { outline: none; border-bottom: 2px solid var(--accent); }
+      .canvas { flex: 1; overflow: auto; padding: 24px; background: var(--surface-3); display: flex; justify-content: center; }
+      .sheet { width: min(700px, 100%); background: #fff; color: #16202b; border-radius: 12px; box-shadow: 0 14px 40px rgba(9, 30, 52, 0.12); padding: 34px 38px 40px; min-height: 420px; }
+      .dropzone { border: 1px dashed transparent; border-radius: 8px; }
+      .dropzone.over { border-color: var(--accent); background: rgba(11, 95, 176, 0.04); }
+      .block { position: relative; border: 1px solid transparent; border-radius: 8px; padding: 6px 8px; margin: 0 0 8px; cursor: grab; }
+      .block:hover { border-color: #cfe0ef; }
+      .block[data-selected='true'] { border-color: #0b5fb0; box-shadow: 0 0 0 3px rgba(11, 95, 176, 0.12); }
+      .block .handle { position: absolute; left: -18px; top: 8px; color: #9aabbb; font-size: 10px; }
+      .block .tools { position: absolute; right: 2px; top: -10px; display: none; gap: 2px; background: #fff; border: 1px solid #dfe7ef; border-radius: 6px; padding: 2px; box-shadow: 0 4px 12px rgba(9,30,52,.1); }
+      .block:hover .tools, .block[data-selected='true'] .tools { display: flex; }
+      .block .tools button { border: 0; background: none; padding: 3px 5px; cursor: pointer; color: #5a6b7c; font-size: 10px; }
+      .block h1 { font-size: 30px; line-height: 1.12; margin: 0 0 8px; letter-spacing: -0.02em; }
+      .block .lead { color: #55677a; font-size: 15px; margin: 0 0 12px; }
+      .block p.copy { white-space: pre-wrap; margin: 0; font-size: 14px; }
+      .block img { max-width: 100%; border-radius: 10px; }
+      .block .cta { display: inline-block; background: var(--site-accent, #0b5fb0); color: #fff; text-decoration: none; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+      .block hr { border: 0; border-top: 1px solid #e3e8ee; }
+      .block.spacer-block { height: 34px; background: repeating-linear-gradient(135deg, #f4f7fa, #f4f7fa 6px, #eef2f6 6px, #eef2f6 12px); border-radius: 6px; }
+      .empty-canvas { text-align: center; color: #7b8b9c; padding: 70px 12px; font-size: 13px; }
+      .hint-line { font-size: 11.5px; color: var(--text-3); margin: 0; }
+      .link-row { display: flex; gap: 6px; align-items: center; }
+      .link-row input { flex: 1; min-width: 120px; font-family: var(--font-mono); font-size: 11px; }
+      .locked { border: 1px dashed var(--border-strong); border-radius: 9px; padding: 9px; font-size: 11.5px; color: var(--text-3); }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      @media (max-width: 980px) { .app { grid-template-columns: 1fr; } .palette { border-right: 0; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; } .palette h2 { width: 100%; } .inspector { border-left: 0; border-top: 1px solid var(--border); } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="palette">
+        <h2>Blocks</h2>
+        <button class="btn quiet sm" data-add="heading"><i class="fa-solid fa-heading"></i> Heading</button>
+        <button class="btn quiet sm" data-add="text"><i class="fa-solid fa-align-left"></i> Text</button>
+        <button class="btn quiet sm" data-add="image"><i class="fa-regular fa-image"></i> Image</button>
+        <button class="btn quiet sm" data-add="button"><i class="fa-solid fa-link"></i> Button</button>
+        <button class="btn quiet sm" data-add="divider"><i class="fa-solid fa-minus"></i> Divider</button>
+        <button class="btn quiet sm" data-add="spacer"><i class="fa-solid fa-arrows-up-down"></i> Spacer</button>
+        <span class="grow"></span>
+        <p class="hint">Drag a block to reorder it.</p>
+      </aside>
+
+      <section class="canvas-wrap">
+        <div class="bar">
+          <input class="site-title" id="site-title" placeholder="My site" aria-label="Site title" />
+          <button class="btn ghost sm" id="save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          <button class="btn quiet sm" id="preview"><i class="fa-solid fa-eye"></i> Preview</button>
+          <button class="btn quiet sm" id="export"><i class="fa-solid fa-download"></i> HTML</button>
+          <button class="btn primary sm" id="publish"><i class="fa-solid fa-globe"></i> Publish</button>
+        </div>
+        <div class="canvas"><div class="sheet" id="sheet" style="--site-accent:#0b5fb0"></div></div>
+      </section>
+
+      <aside class="inspector" id="inspector"></aside>
+    </div>
+    <div class="toasts" id="toast-root"></div>
+    <script type="module">
+      const APP = 'cc:sitebuilder';
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const safeHref = (value) => (/^(https?:\/\/|mailto:|tel:|\/)/i.test(String(value || '').trim()) ? value : '#');
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let site = {
+        title: 'My site',
+        description: '',
+        footer: '',
+        token: '',
+        theme: { accent: '#0b5fb0', background: '#ffffff' },
+        blocks: [],
+        chat: { enabled: false }
+      };
+      let selected = '';
+      let me = { name: '', username: '' };
+      let edition = 'community';
+      let timer = null;
+      let dragId = '';
+
+      const item = (id) => site.blocks.find((block) => block.id === id);
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      async function load() {
+        try {
+          const [data, session] = await Promise.all([api(`/api/apps/${APP}/storage`), api('/api/auth/session')]);
+          const saved = JSON.parse(data.data?.state || '{}');
+          site = { ...site, ...saved, theme: { ...site.theme, ...(saved.theme || {}) }, chat: { ...site.chat, ...(saved.chat || {}) } };
+          if (!Array.isArray(site.blocks)) site.blocks = [];
+          me = session.user || me;
+          edition = session.server?.edition || 'community';
+          $('#site-title').value = site.title || '';
+          render();
+        } catch (error) {
+          if (error.status === 403) return renderConsent();
+          toast(error.message, true);
+        }
+      }
+
+      async function save(quiet = false) {
+        try {
+          await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(site) } });
+          if (!quiet) toast('Site saved');
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      function renderConsent() {
+        $('#sheet').innerHTML = `<div class="empty-canvas"><i class="fa-solid fa-shield-halved"></i><p>Website Builder keeps the site in your account. Allow storage once to start.</p><button class="btn primary sm" id="grant">Allow storage</button></div>`;
+        $('#grant').addEventListener('click', async () => {
+          try {
+            await api(`/api/apps/${APP}/grants`, { method: 'POST', body: { scopes: ['storage'] } });
+            await load();
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      function defaultBlock(type) {
+        const base = { id: uid(), type, align: type === 'heading' ? 'center' : 'left' };
+        if (type === 'heading') return { ...base, text: 'Build something people remember', sub: 'A one-page site, published from your own cloud.', label: 'Get in touch', href: '#contact' };
+        if (type === 'text') return { ...base, text: 'Write the story here. Line breaks are kept when the page is published.' };
+        if (type === 'image') return { ...base, src: '', alt: '' };
+        if (type === 'button') return { ...base, label: 'Learn more', href: 'https://' };
+        return base;
+      }
+
+      function blockPreview(block) {
+        const align = ['left', 'center', 'right'].includes(block.align) ? block.align : 'left';
+        if (block.type === 'heading') {
+          return `<h1>${esc(block.text || 'Headline')}</h1>${block.sub ? `<p class="lead">${esc(block.sub)}</p>` : ''}${
+            block.label ? `<a class="cta" href="${esc(safeHref(block.href))}">${esc(block.label)}</a>` : ''
+          }`;
+        }
+        if (block.type === 'text') return `<p class="copy">${esc(block.text || 'Text')}</p>`;
+        if (block.type === 'image') return block.src ? `<img src="${esc(safeHref(block.src))}" alt="${esc(block.alt || '')}" />` : `<p class="hint" style="color:#8a9aab">Add an image URL in the inspector.</p>`;
+        if (block.type === 'button') return `<a class="cta" href="${esc(safeHref(block.href))}">${esc(block.label || 'Button')}</a>`;
+        if (block.type === 'divider') return '<hr />';
+        return '';
+      }
+
+      function render() {
+        $('#sheet').style.setProperty('--site-accent', site.theme?.accent || '#0b5fb0');
+        $('#sheet').style.background = site.theme?.background || '#fff';
+        $('#sheet').innerHTML = site.blocks.length
+          ? site.blocks
+              .map(
+                (block) => `<div class="dropzone" data-zone="${esc(block.id)}">
+                  <div class="block ${block.type === 'spacer' ? 'spacer-block' : ''}" draggable="true" data-block="${esc(block.id)}" data-selected="${String(block.id === selected)}" style="text-align:${esc(block.align || 'left')}">
+                    <span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>
+                    <div class="tools">
+                      <button data-move="up" title="Move up"><i class="fa-solid fa-arrow-up"></i></button>
+                      <button data-move="down" title="Move down"><i class="fa-solid fa-arrow-down"></i></button>
+                      <button data-remove title="Delete"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    ${blockPreview(block)}
+                  </div>
+                </div>`
+              )
+              .join('')
+          : `<div class="empty-canvas"><p>Add a block from the left to start the page.</p></div>`;
+        wireCanvas();
+        renderInspector();
+        if (!site.title) $('#site-title').value = '';
+      }
+
+      function wireCanvas() {
+        $('#sheet').querySelectorAll('[data-block]').forEach((node) => {
+          node.addEventListener('click', (event) => {
+            if (event.target.closest('[data-move]') || event.target.closest('[data-remove]')) return;
+            selected = node.dataset.block;
+            render();
+          });
+          node.addEventListener('dragstart', () => {
+            dragId = node.dataset.block;
+          });
+          node.addEventListener('dragend', () => {
+            dragId = '';
+          });
+        });
+        $('#sheet').querySelectorAll('[data-zone]').forEach((zone) => {
+          zone.addEventListener('dragover', (event) => {
+            if (!dragId) return;
+            event.preventDefault();
+            zone.classList.add('over');
+          });
+          zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+          zone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            zone.classList.remove('over');
+            if (!dragId || dragId === zone.dataset.zone) return;
+            const from = site.blocks.findIndex((block) => block.id === dragId);
+            const to = site.blocks.findIndex((block) => block.id === zone.dataset.zone);
+            if (from < 0 || to < 0) return;
+            const [moved] = site.blocks.splice(from, 1);
+            site.blocks.splice(to, 0, moved);
+            selected = moved.id;
+            scheduleSave();
+            render();
+          });
+        });
+        $('#sheet').querySelectorAll('[data-move]').forEach((button) =>
+          button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const id = button.closest('[data-block]').dataset.block;
+            const index = site.blocks.findIndex((block) => block.id === id);
+            const next = button.dataset.move === 'up' ? index - 1 : index + 1;
+            if (next < 0 || next >= site.blocks.length) return;
+            const [moved] = site.blocks.splice(index, 1);
+            site.blocks.splice(next, 0, moved);
+            scheduleSave();
+            render();
+          })
+        );
+        $('#sheet').querySelectorAll('[data-remove]').forEach((button) =>
+          button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const id = button.closest('[data-block]').dataset.block;
+            site.blocks = site.blocks.filter((block) => block.id !== id);
+            if (selected === id) selected = '';
+            scheduleSave();
+            render();
+          })
+        );
+      }
+
+      function renderInspector() {
+        const block = item(selected);
+        $('#inspector').innerHTML = `
+          <h2>Site</h2>
+          <div class="field"><label class="label">Accent</label><input class="input" type="color" data-site="accent" value="${esc(site.theme?.accent || '#0b5fb0')}" /></div>
+          <div class="field"><label class="label">Background</label><input class="input" type="color" data-site="background" value="${esc(site.theme?.background || '#ffffff')}" /></div>
+          <div class="field"><label class="label">Footer text</label><input class="input" data-site="footer" value="${esc(site.footer || '')}" placeholder="© My company" /></div>
+          <div class="field"><label class="label">Public link</label>
+            <div class="link-row"><input class="input" id="public-url" readonly value="${esc(site.token ? location.origin + '/s/' + site.token : 'Not published yet')}" /></div>
+            <span class="hint">Publishing makes the page public.</span>
+          </div>
+          <h2 style="margin-top:10px">Live chat</h2>
+          ${
+            edition === 'enterprise'
+              ? `<label class="check"><input type="checkbox" id="chat-toggle" ${site.chat?.enabled ? 'checked' : ''} /> <span><span class="strong small">Live chat</span><span class="tiny dim" style="display:block">Messages create tickets in Helpdesk.</span></span></label>`
+              : `<div class="locked"><i class="fa-solid fa-lock"></i> Live chat is Enterprise only. <a href="https://coolcloud.odoo.com/contactus" target="_blank" rel="noopener noreferrer">Get Enterprise</a></div>`
+          }
+          <h2 style="margin-top:10px">Block</h2>
+          ${
+            block
+              ? `<div class="field"><label class="label">Type</label><input class="input" readonly value="${esc(block.type)}" /></div>
+                ${
+                  block.type === 'heading'
+                    ? `<div class="field"><label class="label">Headline</label><input class="input" data-block-field="text" value="${esc(block.text || '')}" /></div>
+                       <div class="field"><label class="label">Subline</label><input class="input" data-block-field="sub" value="${esc(block.sub || '')}" /></div>
+                       <div class="field"><label class="label">Button label</label><input class="input" data-block-field="label" value="${esc(block.label || '')}" /></div>
+                       <div class="field"><label class="label">Button link</label><input class="input" data-block-field="href" value="${esc(block.href || '')}" /></div>`
+                    : ''
+                }
+                ${block.type === 'text' ? `<div class="field"><label class="label">Text</label><textarea class="input" rows="5" data-block-field="text">${esc(block.text || '')}</textarea></div>` : ''}
+                ${
+                  block.type === 'image'
+                    ? `<div class="field"><label class="label">Image URL</label><input class="input" data-block-field="src" value="${esc(block.src || '')}" /></div>
+                       <div class="field"><label class="label">Alt text</label><input class="input" data-block-field="alt" value="${esc(block.alt || '')}" /></div>`
+                    : ''
+                }
+                ${
+                  block.type === 'button'
+                    ? `<div class="field"><label class="label">Label</label><input class="input" data-block-field="label" value="${esc(block.label || '')}" /></div>
+                       <div class="field"><label class="label">Link</label><input class="input" data-block-field="href" value="${esc(block.href || '')}" /></div>`
+                    : ''
+                }
+                ${
+                  ['heading', 'text', 'image', 'button'].includes(block.type)
+                    ? `<div class="field"><label class="label">Alignment</label><select class="select" data-block-field="align">${['left', 'center', 'right']
+                        .map((align) => `<option value="${align}" ${(block.align || 'left') === align ? 'selected' : ''}>${align}</option>`)
+                        .join('')}</select></div>`
+                    : ''
+                }`
+              : '<p class="hint">Select a block to edit it.</p>'
+          }`;
+
+        $('#inspector').querySelectorAll('[data-site]').forEach((input) =>
+          input.addEventListener('input', () => {
+            const key = input.dataset.site;
+            if (key === 'accent' || key === 'background') site.theme[key] = input.value;
+            else site[key] = input.value;
+            $('#sheet').style.setProperty('--site-accent', site.theme?.accent || '#0b5fb0');
+            $('#sheet').style.background = site.theme?.background || '#fff';
+            scheduleSave();
+          })
+        );
+        $('#chat-toggle')?.addEventListener('change', (event) => {
+          site.chat = { ...(site.chat || {}), enabled: event.target.checked };
+          save(true);
+        });
+        $('#inspector').querySelectorAll('[data-block-field]').forEach((input) =>
+          input.addEventListener('change', () => {
+            const target = item(selected);
+            if (!target) return;
+            target[input.dataset.blockField] = input.value;
+            scheduleSave();
+            render();
+          })
+        );
+      }
+
+      function scheduleSave() {
+        clearTimeout(timer);
+        timer = setTimeout(() => save(true), 700);
+      }
+
+      function ensureToken() {
+        if (!site.token) {
+          const bytes = crypto.getRandomValues(new Uint8Array(18));
+          site.token = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+        return site.token;
+      }
+
+      async function publish() {
+        ensureToken();
+        site.title = $('#site-title').value.trim() || 'My site';
+        await save(true);
+        renderInspector();
+        const url = `${location.origin}/s/${site.token}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          toast('Published · link copied');
+        } catch {
+          toast('Published');
+        }
+        window.open(url, '_blank', 'noopener');
+      }
+
+      function exportHtml() {
+        const blocks = site.blocks
+          .map((block) => {
+            const align = block.align || 'left';
+            if (block.type === 'heading') return `<section style="text-align:${align}"><h1>${esc(block.text || '')}</h1>${block.sub ? `<p class="lead">${esc(block.sub)}</p>` : ''}${block.label ? `<a class="cta" href="${esc(safeHref(block.href))}">${esc(block.label)}</a>` : ''}</section>`;
+            if (block.type === 'text') return `<section style="text-align:${align}"><p>${esc(block.text || '').replace(/\n/g, '<br />')}</p></section>`;
+            if (block.type === 'image') return block.src ? `<section style="text-align:${align}"><img src="${esc(safeHref(block.src))}" alt="${esc(block.alt || '')}" style="max-width:100%;border-radius:12px" /></section>` : '';
+            if (block.type === 'button') return `<section style="text-align:${align}"><a class="cta" href="${esc(safeHref(block.href))}">${esc(block.label || '')}</a></section>`;
+            if (block.type === 'divider') return '<hr />';
+            if (block.type === 'spacer') return '<div style="height:36px"></div>';
+            return '';
+          })
+          .join('\n');
+        const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(site.title || 'Site')}</title>
+<style>body{margin:0;background:${esc(site.theme?.background || '#fff')};color:#16202b;font-family:Inter,system-ui,sans-serif;line-height:1.6}.wrap{max-width:860px;margin:0 auto;padding:56px 22px}h1{font-size:42px;line-height:1.12;letter-spacing:-.02em}.lead{color:#55677a;font-size:18px}.cta{display:inline-block;background:${esc(site.theme?.accent || '#0b5fb0')};color:#fff;padding:11px 18px;border-radius:9px;text-decoration:none;font-weight:600}hr{border:0;border-top:1px solid #e3e8ee}footer{margin-top:40px;color:#7a8898;font-size:12px;text-align:center}</style></head><body><main class="wrap">${blocks}<footer>${esc(site.footer || '')}</footer></main></body></html>`;
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${(site.title || 'site').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.html`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        toast('HTML exported');
+      }
+
+      document.querySelectorAll('[data-add]').forEach((button) =>
+        button.addEventListener('click', () => {
+          const block = defaultBlock(button.dataset.add);
+          site.blocks.push(block);
+          selected = block.id;
+          scheduleSave();
+          render();
+        })
+      );
+      $('#site-title').addEventListener('input', (event) => {
+        site.title = event.target.value;
+        scheduleSave();
+      });
+      $('#save').addEventListener('click', () => save());
+      $('#preview').addEventListener('click', async () => {
+        if (!site.token) return toast('Publish the site first', true);
+        await save(true);
+        window.open(`${location.origin}/s/${site.token}`, '_blank', 'noopener');
+      });
+      $('#publish').addEventListener('click', publish);
+      $('#export').addEventListener('click', exportHtml);
+      load();
+    </script>
+  </body>
+</html>

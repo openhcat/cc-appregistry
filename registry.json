@@ -445,6 +445,87 @@
         "surveys",
         "responses"
       ]
+    },
+    {
+      "id": "cc:helpdesk",
+      "name": "Helpdesk",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Shared support tickets with priorities, assignees and comments. Enterprise only.",
+      "icon": "fa-solid fa-headset",
+      "accent": "projects",
+      "category": "Business",
+      "runtime": "external",
+      "enterprise": true,
+      "contact": "https://coolcloud.odoo.com/contactus",
+      "minVersion": "2.0.0",
+      "tags": [
+        "helpdesk",
+        "support",
+        "tickets"
+      ]
+    },
+    {
+      "id": "cc:inventory",
+      "name": "Inventory",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Track equipment, serials, locations, assignees and values. Enterprise only.",
+      "icon": "fa-solid fa-boxes-stacked",
+      "accent": "finance",
+      "category": "Business",
+      "runtime": "external",
+      "enterprise": true,
+      "contact": "https://coolcloud.odoo.com/contactus",
+      "minVersion": "2.0.0",
+      "tags": [
+        "inventory",
+        "assets",
+        "equipment"
+      ]
+    },
+    {
+      "id": "cc:uptime",
+      "name": "Uptime & Status",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Server-side uptime checks and a public status page. Enterprise only.",
+      "icon": "fa-solid fa-heart-pulse",
+      "accent": "media",
+      "category": "Business",
+      "runtime": "external",
+      "enterprise": true,
+      "contact": "https://coolcloud.odoo.com/contactus",
+      "minVersion": "2.0.0",
+      "tags": [
+        "uptime",
+        "status",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "cc:sitebuilder",
+      "name": "Website Builder",
+      "developer": "cc",
+      "version": "1.0.0",
+      "description": "Drag blocks into a one-page site, publish it in CoolCloud, and export clean HTML.",
+      "icon": "fa-solid fa-layer-group",
+      "accent": "studio",
+      "category": "Business",
+      "runtime": "external",
+      "minVersion": "2.0.0",
+      "path": "apps/cc-sitebuilder",
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "website",
+        "builder",
+        "landing page",
+        "publish"
+      ]
     }
   ]
 }
