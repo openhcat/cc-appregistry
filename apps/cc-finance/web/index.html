@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Finance · CoolCloud</title>
+    <title>Finance · CoolCloud Community</title>
     <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
     <link rel="stylesheet" href="/vendor/fonts/inter.css" />
     <link rel="stylesheet" href="/css/tokens.css" />
@@ -11,28 +11,20 @@
     <link rel="stylesheet" href="/css/components.css" />
     <style>
       body { background: var(--bg); }
-      .app { display: grid; grid-template-columns: 216px 1fr; min-height: 100vh; }
+      .app { display: grid; grid-template-columns: 210px 1fr; min-height: 100vh; }
       .rail { border-right: 1px solid var(--border); background: var(--surface); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
       .rail .brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 15px; }
       .rail .brand i { color: var(--app-finance, var(--accent)); }
-      .rail .nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-      .rail .nav button { display: flex; align-items: center; gap: 9px; border: 0; background: none; padding: 8px 10px; border-radius: 9px; color: var(--text-2); font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
-      .rail .nav button:hover { background: var(--surface-3); color: var(--text); }
-      .rail .nav button[aria-current='true'] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
       .pane { padding: 22px 26px 40px; min-width: 0; }
       .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
       .head h1 { font-size: 21px; margin: 0; letter-spacing: -0.02em; }
       .head p { margin: 3px 0 0; color: var(--text-3); font-size: 12.5px; }
-      .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
-      .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 13px 15px; }
-      .stat b { display: block; font-size: 20px; letter-spacing: -0.03em; }
-      .stat span { color: var(--text-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
-      .stat small { color: var(--text-3); font-size: 11px; }
+      .stats { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; color: var(--text-3); font-size: 12px; }
+      .stats b { display: block; font-size: 19px; color: var(--text); letter-spacing: -0.02em; }
       .money { font-variant-numeric: tabular-nums; }
       .sheet { position: fixed; inset: 0; background: var(--overlay); display: grid; place-items: center; padding: 18px; z-index: 60; }
       .sheet-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: min(470px, 100%); box-shadow: 0 24px 70px rgba(9, 30, 52, 0.3); max-height: 90vh; overflow: auto; }
       .sheet-card h2 { margin: 0 0 3px; font-size: 16px; }
-      .sheet-card .sub { color: var(--text-3); font-size: 12.5px; margin: 0 0 14px; }
       .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
       .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
       .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
@@ -40,30 +32,23 @@
       .empty-state { text-align: center; padding: 40px 10px; color: var(--text-3); }
       .empty-state i { font-size: 26px; display: block; margin-bottom: 10px; opacity: 0.6; }
       .empty-state p { margin: 0 0 12px; font-size: 13px; }
-      @media (max-width: 780px) { .app { grid-template-columns: 1fr; } .rail { border-right: 0; border-bottom: 1px solid var(--border); } .stats { grid-template-columns: repeat(2, 1fr); } .pane { padding: 18px; } }
+      @media (max-width: 780px) { .app { grid-template-columns: 1fr; } .rail { border-right: 0; border-bottom: 1px solid var(--border); } .pane { padding: 18px; } }
     </style>
   </head>
   <body>
     <div class="app">
       <aside class="rail">
         <div class="brand"><i class="fa-solid fa-coins"></i> Finance</div>
-        <p class="hint" style="margin: 0">Invoices, expenses and what is actually left. Nothing leaves this server.</p>
+        <p class="hint" style="margin: 0">Simple invoicing for a small team, kept on your own server.</p>
         <button class="btn primary sm" id="new-invoice"><i class="fa-solid fa-file-invoice-dollar"></i> New invoice</button>
-        <nav class="nav" aria-label="Finance sections">
-          <button data-tab="invoices" aria-current="true"><i class="fa-solid fa-file-invoice"></i> Invoices</button>
-          <button data-tab="expenses"><i class="fa-solid fa-receipt"></i> Expenses</button>
-        </nav>
         <span class="grow"></span>
         <p class="hint" style="margin: 0"><i class="fa-solid fa-lock"></i> Private to you</p>
       </aside>
       <main class="pane">
         <div class="head">
           <div>
-            <h1 id="title">Invoices</h1>
-            <p id="subtitle">What you billed, what came back and what is late.</p>
-          </div>
-          <div class="row" style="gap: 8px">
-            <button class="btn quiet sm" id="new-expense"><i class="fa-solid fa-plus"></i> New expense</button>
+            <h1>Invoices</h1>
+            <p>What you billed and what came back.</p>
           </div>
         </div>
         <div class="stats" id="stats"></div>
@@ -95,8 +80,7 @@
         /* standalone */
       }
 
-      let db = { invoices: [], expenses: [] };
-      let tab = 'invoices';
+      let invoices = [];
 
       async function api(path, { method = 'GET', body } = {}) {
         const init = { method, credentials: 'same-origin', headers: {} };
@@ -127,13 +111,12 @@
         setTimeout(() => node.remove(), bad ? 6000 : 3000);
       }
 
-      function sheet({ title, sub = '', body, submit = 'Save', onSubmit, onMount }) {
+      function sheet({ title, body, submit = 'Save', onSubmit, onMount }) {
         const wrap = document.createElement('div');
         wrap.className = 'sheet';
         wrap.innerHTML = `<form class="sheet-card">
           <h2>${esc(title)}</h2>
-          ${sub ? `<p class="sub">${esc(sub)}</p>` : ''}
-          ${body}
+          <div style="margin-top:12px">${body}</div>
           <div class="actions">
             <button type="button" class="btn ghost" data-close>Cancel</button>
             <button type="submit" class="btn primary">${esc(submit)}</button>
@@ -158,18 +141,14 @@
         });
         $('#modal-root').appendChild(wrap);
         onMount?.(wrap);
-        setTimeout(() => wrap.querySelector('input, textarea, select')?.focus(), 30);
-        return { wrap, close };
+        setTimeout(() => wrap.querySelector('input, select')?.focus(), 30);
       }
 
       async function load() {
         try {
           const data = await api(`/api/apps/${APP}/storage`);
           const saved = JSON.parse(data.data?.state || '{}');
-          db = {
-            invoices: Array.isArray(saved.invoices) ? saved.invoices : [],
-            expenses: Array.isArray(saved.expenses) ? saved.expenses : []
-          };
+          invoices = Array.isArray(saved.invoices) ? saved.invoices : [];
           render();
         } catch (error) {
           if (error.status === 403) return renderConsent();
@@ -178,14 +157,14 @@
       }
 
       async function save() {
-        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(db) } });
+        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify({ invoices }) } });
       }
 
       function renderConsent() {
         $('#stats').innerHTML = '';
         $('#view').innerHTML = `<div class="card empty-state">
           <i class="fa-solid fa-shield-halved"></i>
-          <p>Finance keeps its books in your CoolCloud account. Allow storage once to start.</p>
+          <p>Finance keeps its invoices in your CoolCloud account. Allow storage once to start.</p>
           <button class="btn primary sm" id="grant"><i class="fa-solid fa-check"></i> Allow storage</button>
         </div>`;
         $('#grant').addEventListener('click', async () => {
@@ -198,30 +177,17 @@
         });
       }
 
-      function render() {
-        const paid = db.invoices.filter((invoice) => invoice.status === 'paid').reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
-        const sent = db.invoices.filter((invoice) => invoice.status === 'sent').reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
-        const spent = db.expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
-        $('#stats').innerHTML = `
-          <div class="stat"><span>Paid</span><b class="money">${money(paid)}</b><small>${db.invoices.filter((i) => i.status === 'paid').length} invoices</small></div>
-          <div class="stat"><span>Outstanding</span><b class="money">${money(sent)}</b><small>${db.invoices.filter((i) => i.status === 'sent').length} sent</small></div>
-          <div class="stat"><span>Expenses</span><b class="money">${money(spent)}</b><small>${db.expenses.length} entries</small></div>
-          <div class="stat"><span>Net</span><b class="money" style="color:${paid - spent >= 0 ? 'var(--ok)' : 'var(--danger)'}">${money(paid - spent)}</b><small>paid minus expenses</small></div>`;
-        document.querySelectorAll('.rail [data-tab]').forEach((node) => node.setAttribute('aria-current', String(node.dataset.tab === tab)));
-        $('#title').textContent = tab === 'invoices' ? 'Invoices' : 'Expenses';
-        $('#subtitle').textContent =
-          tab === 'invoices' ? 'What you billed, what came back and what is late.' : 'Every cost you want to remember at the end of the month.';
-        if (tab === 'invoices') renderInvoices();
-        else renderExpenses();
-      }
-
       function statusBadge(status) {
         const map = { paid: 'ok', sent: 'accent', draft: '', void: 'danger' };
         return `<span class="badge ${map[status] || ''}">${esc(STATUS.find(([key]) => key === status)?.[1] || 'Draft')}</span>`;
       }
 
-      function renderInvoices() {
-        const list = [...db.invoices].sort((a, b) => String(b.issued || '').localeCompare(String(a.issued || '')));
+      function render() {
+        const paid = invoices.filter((invoice) => invoice.status === 'paid').reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
+        const sent = invoices.filter((invoice) => invoice.status === 'sent').reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
+        $('#stats').innerHTML = `<div><span>Paid</span><b class="money">${money(paid)}</b></div><div><span>Outstanding</span><b class="money">${money(sent)}</b></div><div><span>Invoices</span><b>${invoices.length}</b></div>`;
+
+        const list = [...invoices].sort((a, b) => String(b.issued || '').localeCompare(String(a.issued || '')));
         $('#view').innerHTML = list.length
           ? `<table class="table"><thead><tr><th>Number</th><th>Client</th><th>Issued</th><th>Due</th><th class="money">Amount</th><th>Status</th><th></th></tr></thead><tbody>
               ${list
@@ -238,22 +204,23 @@
                 )
                 .join('')}
             </tbody></table>`
-          : `<div class="card empty-state"><i class="fa-solid fa-file-invoice"></i><p>No invoices yet. Bill your first client.</p><button class="btn primary sm" data-new-invoice>New invoice</button></div>`;
+          : `<div class="card empty-state"><i class="fa-solid fa-file-invoice"></i><p>No invoices yet. Bill your first client.</p><button class="btn primary sm" data-new>New invoice</button></div>`;
+
         $('#view').querySelectorAll('[data-edit]').forEach((node) => node.addEventListener('click', () => invoiceForm(node.dataset.edit)));
         $('#view').querySelectorAll('[data-del]').forEach((node) =>
           node.addEventListener('click', async () => {
             if (!confirm('Delete this invoice?')) return;
-            db.invoices = db.invoices.filter((invoice) => invoice.id !== node.dataset.del);
+            invoices = invoices.filter((invoice) => invoice.id !== node.dataset.del);
             await save();
             render();
             toast('Invoice deleted');
           })
         );
-        $('#view').querySelector('[data-new-invoice]')?.addEventListener('click', () => invoiceForm());
+        $('#view').querySelector('[data-new]')?.addEventListener('click', () => invoiceForm());
       }
 
       function invoiceForm(id) {
-        const invoice = db.invoices.find((item) => item.id === id) || { status: 'draft', issued: today() };
+        const invoice = invoices.find((item) => item.id === id) || { status: 'draft', issued: today() };
         sheet({
           title: id ? 'Edit invoice' : 'New invoice',
           body: `<div class="stack-3">
@@ -271,7 +238,7 @@
             const data = Object.fromEntries(new FormData(wrap.querySelector('form')).entries());
             data.amount = Number(data.amount) || 0;
             if (id) Object.assign(invoice, data);
-            else db.invoices.push({ id: uid(), ...data });
+            else invoices.push({ id: uid(), ...data });
             await save();
             render();
             toast(id ? 'Invoice updated' : 'Invoice added');
@@ -279,68 +246,7 @@
         });
       }
 
-      function renderExpenses() {
-        const list = [...db.expenses].sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-        $('#view').innerHTML = list.length
-          ? `<table class="table"><thead><tr><th>Vendor</th><th>Category</th><th>Date</th><th class="money">Amount</th><th></th></tr></thead><tbody>
-              ${list
-                .map(
-                  (expense) => `<tr>
-                    <td><button class="strong small" style="border:0;background:none;padding:0;cursor:pointer;font:inherit;color:var(--accent)" data-edit="${esc(expense.id)}">${esc(expense.vendor || '—')}</button></td>
-                    <td class="small">${esc(expense.category || '—')}</td>
-                    <td class="small">${esc(expense.date || '—')}</td>
-                    <td class="money small">${money(expense.amount)}</td>
-                    <td class="actions"><button class="btn ghost icon sm" data-edit="${esc(expense.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button><button class="btn ghost icon sm" data-del="${esc(expense.id)}" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></td>
-                  </tr>`
-                )
-                .join('')}
-            </tbody></table>`
-          : `<div class="card empty-state"><i class="fa-solid fa-receipt"></i><p>No expenses yet. Record what the work costs.</p><button class="btn primary sm" data-new-expense>New expense</button></div>`;
-        $('#view').querySelectorAll('[data-edit]').forEach((node) => node.addEventListener('click', () => expenseForm(node.dataset.edit)));
-        $('#view').querySelectorAll('[data-del]').forEach((node) =>
-          node.addEventListener('click', async () => {
-            if (!confirm('Delete this expense?')) return;
-            db.expenses = db.expenses.filter((expense) => expense.id !== node.dataset.del);
-            await save();
-            render();
-            toast('Expense deleted');
-          })
-        );
-        $('#view').querySelector('[data-new-expense]')?.addEventListener('click', () => expenseForm());
-      }
-
-      function expenseForm(id) {
-        const expense = db.expenses.find((item) => item.id === id) || { date: today() };
-        sheet({
-          title: id ? 'Edit expense' : 'New expense',
-          body: `<div class="stack-3">
-            <div class="field"><label class="label">Vendor</label><input class="input" name="vendor" value="${esc(expense.vendor || '')}" /></div>
-            <div class="field-row"><div class="field"><label class="label">Amount</label><input class="input" type="number" min="0" step="0.01" name="amount" value="${esc(expense.amount ?? '')}" /></div>
-            <div class="field"><label class="label">Date</label><input class="input" type="date" name="date" value="${esc(expense.date || today())}" /></div></div>
-            <div class="field"><label class="label">Category</label><input class="input" name="category" placeholder="Hosting, travel, hardware..." value="${esc(expense.category || '')}" /></div>
-            <div class="field"><label class="label">Notes</label><textarea class="input" name="notes" rows="2">${esc(expense.notes || '')}</textarea></div>
-          </div>`,
-          onSubmit: async (wrap) => {
-            const data = Object.fromEntries(new FormData(wrap.querySelector('form')).entries());
-            data.amount = Number(data.amount) || 0;
-            if (!String(data.vendor).trim()) throw new Error('A vendor is required');
-            if (id) Object.assign(expense, data);
-            else db.expenses.push({ id: uid(), ...data });
-            await save();
-            render();
-            toast(id ? 'Expense updated' : 'Expense added');
-          }
-        });
-      }
-
-      document.querySelectorAll('.rail [data-tab]').forEach((node) =>
-        node.addEventListener('click', () => {
-          tab = node.dataset.tab;
-          render();
-        })
-      );
       $('#new-invoice').addEventListener('click', () => invoiceForm());
-      $('#new-expense').addEventListener('click', () => expenseForm());
       load();
     </script>
   </body>

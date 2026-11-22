@@ -2,14 +2,16 @@
   "id": "cc:crm",
   "name": "CRM",
   "developer": "cc",
-  "version": "1.0.0",
-  "description": "Contacts, companies and a deal pipeline that lives in your own cloud.",
+  "version": "1.1.0",
+  "description": "A focused contacts book for people and companies, kept in your account.",
   "icon": "fa-solid fa-handshake",
   "accent": "crm",
   "category": "Business",
   "entry": "web/index.html",
   "runtime": "external",
   "essentials": true,
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "website": "https://coolcloud.odoo.com"
 }

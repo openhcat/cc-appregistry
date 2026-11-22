@@ -9,7 +9,15 @@
   "repo": "https://github.com/openhcat/cc-appregistry.git",
   "branch": "main",
   "updated": "2026-11-22",
-  "categories": ["Files", "Productivity", "Business", "Communication", "Media", "AI", "Developer"],
+  "categories": [
+    "Files",
+    "Productivity",
+    "Business",
+    "Communication",
+    "Media",
+    "AI",
+    "Developer"
+  ],
   "apps": [
     {
       "id": "cc:files",
@@ -23,8 +31,14 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-files",
-      "files": ["manifest.json"],
-      "tags": ["storage", "drive", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "storage",
+        "drive",
+        "core"
+      ]
     },
     {
       "id": "cc:calendar",
@@ -38,8 +52,14 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-calendar",
-      "files": ["manifest.json"],
-      "tags": ["calendar", "events", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "calendar",
+        "events",
+        "core"
+      ]
     },
     {
       "id": "cc:mail",
@@ -53,8 +73,15 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-mail",
-      "files": ["manifest.json"],
-      "tags": ["email", "imap", "smtp", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "email",
+        "imap",
+        "smtp",
+        "core"
+      ]
     },
     {
       "id": "cc:contacts",
@@ -68,8 +95,14 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-contacts",
-      "files": ["manifest.json"],
-      "tags": ["people", "address book", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "people",
+        "address book",
+        "core"
+      ]
     },
     {
       "id": "cc:editor",
@@ -83,8 +116,14 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-editor",
-      "files": ["manifest.json"],
-      "tags": ["markdown", "documents", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "markdown",
+        "documents",
+        "core"
+      ]
     },
     {
       "id": "cc:tasks",
@@ -98,8 +137,14 @@
       "runtime": "core",
       "builtin": true,
       "path": "apps/cc-tasks",
-      "files": ["manifest.json"],
-      "tags": ["todo", "lists", "core"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "todo",
+        "lists",
+        "core"
+      ]
     },
     {
       "id": "cc:connect",
@@ -114,8 +159,15 @@
       "builtin": true,
       "essentials": true,
       "path": "apps/cc-connect",
-      "files": ["manifest.json"],
-      "tags": ["chat", "calls", "team", "essentials"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "chat",
+        "calls",
+        "team",
+        "essentials"
+      ]
     },
     {
       "id": "cc:media",
@@ -130,8 +182,15 @@
       "builtin": true,
       "essentials": true,
       "path": "apps/cc-media",
-      "files": ["manifest.json"],
-      "tags": ["photos", "video", "gallery", "essentials"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "photos",
+        "video",
+        "gallery",
+        "essentials"
+      ]
     },
     {
       "id": "cc:assistant",
@@ -147,38 +206,63 @@
       "essentials": true,
       "beta": true,
       "path": "apps/cc-assistant",
-      "files": ["manifest.json"],
-      "tags": ["ai", "assistant", "beta", "essentials"]
+      "files": [
+        "manifest.json"
+      ],
+      "tags": [
+        "ai",
+        "assistant",
+        "beta",
+        "essentials"
+      ]
     },
     {
       "id": "cc:crm",
       "name": "CRM",
       "developer": "cc",
-      "version": "1.0.0",
-      "description": "Contacts, companies and a deal pipeline that lives in your own cloud.",
+      "version": "1.1.0",
+      "description": "A focused contacts book for people and companies, kept in your account.",
       "icon": "fa-solid fa-handshake",
       "accent": "crm",
       "category": "Business",
       "runtime": "external",
       "essentials": true,
       "path": "apps/cc-crm",
-      "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["crm", "contacts", "pipeline", "sales", "essentials"]
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "crm",
+        "contacts",
+        "address book",
+        "essentials"
+      ]
     },
     {
       "id": "cc:finance",
       "name": "Finance",
       "developer": "cc",
-      "version": "1.0.0",
-      "description": "Invoices, expenses and a running cash position without a spreadsheet.",
+      "version": "1.1.0",
+      "description": "Simple invoicing: what you billed and what came back.",
       "icon": "fa-solid fa-coins",
       "accent": "finance",
       "category": "Business",
       "runtime": "external",
       "essentials": true,
       "path": "apps/cc-finance",
-      "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["finance", "invoices", "expenses", "accounting", "essentials"]
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "finance",
+        "invoices",
+        "billing",
+        "essentials"
+      ]
     },
     {
       "id": "cc:projects",
@@ -192,8 +276,18 @@
       "runtime": "external",
       "essentials": true,
       "path": "apps/cc-projects",
-      "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["projects", "kanban", "tasks", "planning", "essentials"]
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "projects",
+        "kanban",
+        "tasks",
+        "planning",
+        "essentials"
+      ]
     },
     {
       "id": "cc:studio",
@@ -207,8 +301,18 @@
       "runtime": "external",
       "essentials": true,
       "path": "apps/cc-studio",
-      "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["sharing", "review", "comments", "links", "essentials"]
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "sharing",
+        "review",
+        "comments",
+        "links",
+        "essentials"
+      ]
     },
     {
       "id": "cc:notes",
@@ -221,8 +325,16 @@
       "category": "Productivity",
       "runtime": "external",
       "path": "apps/cc-notes",
-      "files": ["manifest.json", "web/index.html", "README.md"],
-      "tags": ["notes", "markdown", "writing"]
+      "files": [
+        "manifest.json",
+        "web/index.html",
+        "README.md"
+      ],
+      "tags": [
+        "notes",
+        "markdown",
+        "writing"
+      ]
     }
   ]
 }
