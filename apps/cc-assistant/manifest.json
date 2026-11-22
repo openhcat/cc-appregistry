@@ -1,0 +1,15 @@
+{
+  "id": "cc:assistant",
+  "name": "Assistant",
+  "developer": "cc",
+  "version": "2.0.0",
+  "description": "An assistant inside your cloud. Bring your own key.",
+  "icon": "fa-solid fa-wand-magic-sparkles",
+  "accent": "assistant",
+  "category": "AI",
+  "entry": "web/index.html",
+  "builtin": true,
+  "runtime": "core",
+  "meta": { "beta": true },
+  "permissions": ["assistant:chat"]
+}

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRM · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .app { display: grid; grid-template-columns: 216px 1fr; min-height: 100vh; }
+      .rail { border-right: 1px solid var(--border); background: var(--surface); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+      .rail .brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 15px; color: var(--text); }
+      .rail .brand i { color: var(--app-crm, var(--accent)); }
+      .rail .nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+      .rail .nav button { display: flex; align-items: center; gap: 9px; border: 0; background: none; padding: 8px 10px; border-radius: 9px; color: var(--text-2); font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+      .rail .nav button:hover { background: var(--surface-3); color: var(--text); }
+      .rail .nav button[aria-current='true'] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+      .pane { padding: 22px 26px 40px; min-width: 0; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+      .head h1 { font-size: 21px; margin: 0; letter-spacing: -0.02em; }
+      .head p { margin: 3px 0 0; color: var(--text-3); font-size: 12.5px; }
+      .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+      .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 13px 15px; }
+      .stat b { display: block; font-size: 20px; letter-spacing: -0.03em; }
+      .stat span { color: var(--text-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+      .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+      .toolbar input { flex: 1; min-width: 180px; }
+      .board { display: grid; grid-template-columns: repeat(5, minmax(170px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+      .col { background: var(--surface-2); border: 1px solid var(--border); border-radius: 13px; padding: 10px; min-height: 140px; display: flex; flex-direction: column; gap: 8px; }
+      .col h3 { margin: 0 0 2px; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); display: flex; justify-content: space-between; }
+      .deal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; }
+      .deal:hover { border-color: var(--accent-line); }
+      .deal b { display: block; font-size: 12.5px; }
+      .deal span { font-size: 11.5px; color: var(--text-3); }
+      .deal .val { color: var(--ok); font-weight: 650; font-size: 12px; }
+      .sheet { position: fixed; inset: 0; background: var(--overlay); display: grid; place-items: center; padding: 18px; z-index: 60; }
+      .sheet-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: min(470px, 100%); box-shadow: 0 24px 70px rgba(9, 30, 52, 0.3); max-height: 90vh; overflow: auto; }
+      .sheet-card h2 { margin: 0 0 3px; font-size: 16px; }
+      .sheet-card .sub { color: var(--text-3); font-size: 12.5px; margin: 0 0 14px; }
+      .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      .empty-state { text-align: center; padding: 40px 10px; color: var(--text-3); }
+      .empty-state i { font-size: 26px; display: block; margin-bottom: 10px; opacity: 0.6; }
+      .empty-state p { margin: 0 0 12px; font-size: 13px; }
+      @media (max-width: 780px) { .app { grid-template-columns: 1fr; } .rail { border-right: 0; border-bottom: 1px solid var(--border); } .stats { grid-template-columns: repeat(2, 1fr); } .pane { padding: 18px; } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="rail">
+        <div class="brand"><i class="fa-solid fa-handshake"></i> CRM</div>
+        <p class="hint" style="margin: 0">People, companies and the deals in flight. Stored in your CoolCloud account.</p>
+        <button class="btn primary sm" id="new-contact"><i class="fa-solid fa-user-plus"></i> New contact</button>
+        <nav class="nav" aria-label="CRM sections">
+          <button data-tab="contacts" aria-current="true"><i class="fa-regular fa-address-book"></i> Contacts</button>
+          <button data-tab="pipeline"><i class="fa-solid fa-filter"></i> Pipeline</button>
+        </nav>
+        <span class="grow"></span>
+        <p class="hint" style="margin: 0"><i class="fa-solid fa-lock"></i> Private to you</p>
+      </aside>
+      <main class="pane">
+        <div class="head">
+          <div>
+            <h1 id="title">Contacts</h1>
+            <p id="subtitle">Everyone you do business with, in one book.</p>
+          </div>
+          <div class="row" style="gap: 8px">
+            <button class="btn quiet sm" id="new-deal"><i class="fa-solid fa-plus"></i> New deal</button>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div id="view"></div>
+      </main>
+    </div>
+    <div id="modal-root"></div>
+    <div class="toasts" id="toast-root"></div>
+
+    <script type="module">
+      const APP = 'cc:crm';
+      const STAGES = [
+        ['lead', 'Lead'],
+        ['qualified', 'Qualified'],
+        ['proposal', 'Proposal'],
+        ['won', 'Won'],
+        ['lost', 'Lost']
+      ];
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const money = (value) => '$' + Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let db = { contacts: [], deals: [] };
+      let tab = 'contacts';
+      let query = '';
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      function sheet({ title, sub = '', body, submit = 'Save', onSubmit }) {
+        const wrap = document.createElement('div');
+        wrap.className = 'sheet';
+        wrap.innerHTML = `<form class="sheet-card">
+          <h2>${esc(title)}</h2>
+          ${sub ? `<p class="sub">${esc(sub)}</p>` : ''}
+          ${body}
+          <div class="actions">
+            <button type="button" class="btn ghost" data-close>Cancel</button>
+            <button type="submit" class="btn primary">${esc(submit)}</button>
+          </div>
+        </form>`;
+        const close = () => wrap.remove();
+        wrap.addEventListener('mousedown', (event) => {
+          if (event.target === wrap) close();
+        });
+        wrap.querySelector('[data-close]').addEventListener('click', close);
+        wrap.querySelector('form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const button = wrap.querySelector('button[type="submit"]');
+          button.disabled = true;
+          try {
+            await onSubmit(wrap);
+            close();
+          } catch (error) {
+            toast(error.message, true);
+            button.disabled = false;
+          }
+        });
+        $('#modal-root').appendChild(wrap);
+        setTimeout(() => wrap.querySelector('input, textarea, select')?.focus(), 30);
+        return { wrap, close };
+      }
+
+      async function load() {
+        try {
+          const data = await api(`/api/apps/${APP}/storage`);
+          const saved = JSON.parse(data.data?.state || '{}');
+          db = { contacts: Array.isArray(saved.contacts) ? saved.contacts : [], deals: Array.isArray(saved.deals) ? saved.deals : [] };
+          render();
+        } catch (error) {
+          if (error.status === 403) return renderConsent();
+          toast(error.message, true);
+        }
+      }
+
+      async function save() {
+        await api(`/api/apps/${APP}/storage`, { method: 'PUT', body: { key: 'state', value: JSON.stringify(db) } });
+      }
+
+      function renderConsent() {
+        $('#stats').innerHTML = '';
+        $('#view').innerHTML = `<div class="card empty-state">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>CRM keeps its contacts and deals in your CoolCloud account. Allow storage once to start.</p>
+          <button class="btn primary sm" id="grant"><i class="fa-solid fa-check"></i> Allow storage</button>
+        </div>`;
+        $('#grant').addEventListener('click', async () => {
+          try {
+            await api(`/api/apps/${APP}/grants`, { method: 'POST', body: { scopes: ['storage'] } });
+            await load();
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      function render() {
+        const open = db.deals.filter((deal) => deal.stage && !['won', 'lost'].includes(deal.stage));
+        const pipeline = open.reduce((sum, deal) => sum + Number(deal.value || 0), 0);
+        const won = db.deals.filter((deal) => deal.stage === 'won').reduce((sum, deal) => sum + Number(deal.value || 0), 0);
+        $('#stats').innerHTML = `
+          <div class="stat"><span>Contacts</span><b>${db.contacts.length}</b></div>
+          <div class="stat"><span>Open deals</span><b>${open.length}</b></div>
+          <div class="stat"><span>Open pipeline</span><b>${money(pipeline)}</b></div>
+          <div class="stat"><span>Won</span><b>${money(won)}</b></div>`;
+
+        document.querySelectorAll('.rail [data-tab]').forEach((node) => {
+          node.setAttribute('aria-current', String(node.dataset.tab === tab));
+        });
+        $('#title').textContent = tab === 'contacts' ? 'Contacts' : 'Pipeline';
+        $('#subtitle').textContent =
+          tab === 'contacts' ? 'Everyone you do business with, in one book.' : 'Drag your attention across the stages, not your mouse.';
+
+        if (tab === 'contacts') return renderContacts();
+        return renderPipeline();
+      }
+
+      function renderContacts() {
+        const list = db.contacts
+          .filter((contact) => !query || `${contact.name} ${contact.company} ${contact.email}`.toLowerCase().includes(query))
+          .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        const dealsFor = (contact) => db.deals.filter((deal) => deal.contact === contact.id);
+        $('#view').innerHTML = `
+          <div class="toolbar">
+            <input class="input" id="search" placeholder="Search contacts..." value="${esc(query)}" aria-label="Search contacts" />
+          </div>
+          ${
+            list.length
+              ? `<table class="table"><thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Open deals</th><th></th></tr></thead><tbody>
+                  ${list
+                    .map((contact) => {
+                      const deals = dealsFor(contact);
+                      return `<tr>
+                        <td><button class="strong small" style="border:0;background:none;padding:0;cursor:pointer;font:inherit;color:var(--accent)" data-edit-contact="${esc(contact.id)}">${esc(contact.name || 'Unnamed')}</button><div class="tiny dim">${esc(contact.phone || '')}</div></td>
+                        <td class="small">${esc(contact.company || '—')}</td>
+                        <td class="small">${contact.email ? `<a href="mailto:${esc(contact.email)}">${esc(contact.email)}</a>` : '—'}</td>
+                        <td>${deals.length ? `<span class="badge">${deals.length}</span>` : '<span class="tiny dim">—</span>'}</td>
+                        <td class="actions"><button class="btn ghost icon sm" data-edit-contact="${esc(contact.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button><button class="btn ghost icon sm" data-del-contact="${esc(contact.id)}" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></td>
+                      </tr>`;
+                    })
+                    .join('')}
+                </tbody></table>`
+              : `<div class="card empty-state"><i class="fa-regular fa-address-book"></i><p>${query ? 'No contact matches that search.' : 'Your book is empty. Add the first person you work with.'}</p><button class="btn primary sm" data-new-contact>Add a contact</button></div>`
+          }`;
+        $('#search')?.addEventListener('input', (event) => {
+          query = event.target.value.trim().toLowerCase();
+          renderContacts();
+        });
+        $('#view').querySelectorAll('[data-edit-contact]').forEach((node) =>
+          node.addEventListener('click', () => contactForm(node.dataset.editContact))
+        );
+        $('#view').querySelectorAll('[data-del-contact]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            const contact = db.contacts.find((item) => item.id === node.dataset.delContact);
+            if (!contact || !confirm(`Delete ${contact.name}?`)) return;
+            db.contacts = db.contacts.filter((item) => item.id !== contact.id);
+            db.deals = db.deals.filter((deal) => deal.contact !== contact.id);
+            await save();
+            render();
+            toast('Contact deleted');
+          })
+        );
+        $('#view').querySelector('[data-new-contact]')?.addEventListener('click', () => contactForm());
+      }
+
+      function contactForm(id) {
+        const contact = db.contacts.find((item) => item.id === id) || {};
+        sheet({
+          title: id ? 'Edit contact' : 'New contact',
+          body: `<div class="stack-3">
+            <div class="field"><label class="label">Name</label><input class="input" name="name" required value="${esc(contact.name || '')}" /></div>
+            <div class="field"><label class="label">Company</label><input class="input" name="company" value="${esc(contact.company || '')}" /></div>
+            <div class="field-row"><div class="field"><label class="label">Email</label><input class="input" type="email" name="email" value="${esc(contact.email || '')}" /></div>
+            <div class="field"><label class="label">Phone</label><input class="input" name="phone" value="${esc(contact.phone || '')}" /></div></div>
+            <div class="field"><label class="label">Notes</label><textarea class="input" name="notes" rows="3">${esc(contact.notes || '')}</textarea></div>
+          </div>`,
+          onSubmit: async (wrap) => {
+            const form = wrap.querySelector('form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            if (!String(data.name).trim()) throw new Error('A name is required');
+            if (id) Object.assign(contact, data);
+            else db.contacts.push({ id: uid(), ...data });
+            await save();
+            render();
+            toast(id ? 'Contact updated' : 'Contact added');
+          }
+        });
+      }
+
+      function renderPipeline() {
+        $('#view').innerHTML = `<div class="board">${STAGES.map(([key, label]) => {
+          const deals = db.deals.filter((deal) => (deal.stage || 'lead') === key);
+          return `<section class="col"><h3><span>${label}</span><span>${deals.length}</span></h3>
+            ${deals
+              .map(
+                (deal) => `<article class="deal" data-edit-deal="${esc(deal.id)}">
+                  <b>${esc(deal.title || 'Untitled deal')}</b>
+                  <span>${esc(db.contacts.find((contact) => contact.id === deal.contact)?.name || 'No contact')}</span>
+                  <div class="val">${money(deal.value)}</div>
+                </article>`
+              )
+              .join('')}
+            ${deals.length ? '' : '<p class="tiny dim" style="margin:4px">Nothing here.</p>'}
+          </section>`;
+        }).join('')}</div>
+        ${db.deals.length ? '' : `<div class="card empty-state" style="margin-top:16px"><i class="fa-solid fa-filter"></i><p>No deals yet. Add one and move it through the stages.</p><button class="btn primary sm" data-new-deal>Add a deal</button></div>`}`;
+        $('#view').querySelectorAll('[data-edit-deal]').forEach((node) =>
+          node.addEventListener('click', () => dealForm(node.dataset.editDeal))
+        );
+        $('#view').querySelector('[data-new-deal]')?.addEventListener('click', () => dealForm());
+      }
+
+      function dealForm(id) {
+        const deal = db.deals.find((item) => item.id === id) || {};
+        sheet({
+          title: id ? 'Edit deal' : 'New deal',
+          body: `<div class="stack-3">
+            <div class="field"><label class="label">Deal</label><input class="input" name="title" required value="${esc(deal.title || '')}" /></div>
+            <div class="field-row"><div class="field"><label class="label">Value</label><input class="input" type="number" min="0" step="1" name="value" value="${esc(deal.value ?? '')}" /></div>
+            <div class="field"><label class="label">Stage</label><select class="select" name="stage">${STAGES.map(
+              ([key, label]) => `<option value="${key}" ${((deal.stage || 'lead') === key) ? 'selected' : ''}>${label}</option>`
+            ).join('')}</select></div></div>
+            <div class="field"><label class="label">Contact</label><select class="select" name="contact"><option value="">No contact</option>${db.contacts
+              .map((contact) => `<option value="${esc(contact.id)}" ${deal.contact === contact.id ? 'selected' : ''}>${esc(contact.name)}</option>`)
+              .join('')}</select></div>
+            <div class="field"><label class="label">Notes</label><textarea class="input" name="notes" rows="2">${esc(deal.notes || '')}</textarea></div>
+          </div>
+          ${id ? '<div class="actions" style="justify-content:flex-start;margin-top:10px"><button type="button" class="btn danger sm" data-delete>Delete deal</button></div>' : ''}`,
+          onSubmit: async (wrap) => {
+            const data = Object.fromEntries(new FormData(wrap.querySelector('form')).entries());
+            data.value = Number(data.value) || 0;
+            if (!String(data.title).trim()) throw new Error('A deal needs a title');
+            if (id) Object.assign(deal, data);
+            else db.deals.push({ id: uid(), ...data });
+            await save();
+            render();
+            toast(id ? 'Deal updated' : 'Deal added');
+          }
+        });
+        if (id) {
+          document.querySelector('.sheet [data-delete]')?.addEventListener('click', async () => {
+            if (!confirm('Delete this deal?')) return;
+            db.deals = db.deals.filter((item) => item.id !== id);
+            await save();
+            document.querySelector('.sheet')?.remove();
+            render();
+            toast('Deal deleted');
+          });
+        }
+      }
+
+      document.querySelectorAll('.rail [data-tab]').forEach((node) => {
+        node.addEventListener('click', () => {
+          tab = node.dataset.tab;
+          query = '';
+          render();
+        });
+      });
+      $('#new-contact').addEventListener('click', () => contactForm());
+      $('#new-deal').addEventListener('click', () => dealForm());
+      load();
+    </script>
+  </body>
+</html>

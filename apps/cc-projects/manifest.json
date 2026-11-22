@@ -1,0 +1,15 @@
+{
+  "id": "cc:projects",
+  "name": "Projects",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Boards, tasks and progress for the work you actually ship.",
+  "icon": "fa-solid fa-diagram-project",
+  "accent": "projects",
+  "category": "Business",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "essentials": true,
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

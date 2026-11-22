@@ -1,0 +1,14 @@
+{
+  "id": "cc:connect",
+  "name": "Connect",
+  "developer": "cc",
+  "version": "2.0.0",
+  "description": "Sovereign messaging with channels, direct messages and peer-to-peer calls.",
+  "icon": "fa-regular fa-comments",
+  "accent": "connect",
+  "category": "Communication",
+  "entry": "web/index.html",
+  "builtin": true,
+  "runtime": "core",
+  "permissions": ["connect:read", "connect:write"]
+}

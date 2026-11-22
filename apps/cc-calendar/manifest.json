@@ -1,0 +1,14 @@
+{
+  "id": "cc:calendar",
+  "name": "Calendar",
+  "developer": "cc",
+  "version": "2.0.0",
+  "description": "Month, week and day views, all-day events, places and notes.",
+  "icon": "fa-solid fa-calendar",
+  "accent": "calendar",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "builtin": true,
+  "runtime": "core",
+  "permissions": ["calendar:read", "calendar:write"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "cc:crm",
+  "name": "CRM",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Contacts, companies and a deal pipeline that lives in your own cloud.",
+  "icon": "fa-solid fa-handshake",
+  "accent": "crm",
+  "category": "Business",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "essentials": true,
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

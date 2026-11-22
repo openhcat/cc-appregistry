@@ -1,0 +1,15 @@
+{
+  "id": "cc:studio",
+  "name": "Studio",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Share links and file review: publish, expire and revoke links, and read the comment thread.",
+  "icon": "fa-solid fa-clapperboard",
+  "accent": "studio",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "essentials": true,
+  "permissions": ["files:read", "files:write"],
+  "website": "https://coolcloud.odoo.com"
+}

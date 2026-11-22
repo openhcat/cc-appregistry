@@ -1,0 +1,15 @@
+{
+  "id": "cc:finance",
+  "name": "Finance",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Invoices, expenses and a running cash position without a spreadsheet.",
+  "icon": "fa-solid fa-coins",
+  "accent": "finance",
+  "category": "Business",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "essentials": true,
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

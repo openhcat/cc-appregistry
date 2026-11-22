@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Studio · CoolCloud</title>
+    <link rel="stylesheet" href="/vendor/fa/css/all.min.css" />
+    <link rel="stylesheet" href="/vendor/fonts/inter.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+      body { background: var(--bg); }
+      .app { display: grid; grid-template-columns: 216px 1fr; min-height: 100vh; }
+      .rail { border-right: 1px solid var(--border); background: var(--surface); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+      .rail .brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 15px; }
+      .rail .brand i { color: var(--app-studio, var(--accent)); }
+      .rail .nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+      .rail .nav button { display: flex; align-items: center; gap: 9px; border: 0; background: none; padding: 8px 10px; border-radius: 9px; color: var(--text-2); font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+      .rail .nav button:hover { background: var(--surface-3); color: var(--text); }
+      .rail .nav button[aria-current='true'] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+      .pane { padding: 22px 26px 40px; min-width: 0; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+      .head h1 { font-size: 21px; margin: 0; letter-spacing: -0.02em; }
+      .head p { margin: 3px 0 0; color: var(--text-3); font-size: 12.5px; }
+      .link-row { display: flex; gap: 11px; align-items: center; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+      .link-row .ico { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-3); color: var(--accent); flex: none; }
+      .link-row .meta { font-size: 11.5px; color: var(--text-3); }
+      .comment { border: 1px solid var(--border); border-radius: 11px; padding: 11px 13px; background: var(--surface); }
+      .comment .who { display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+      .comment .who span { font-weight: 400; color: var(--text-3); font-size: 11px; }
+      .comment p { margin: 0; font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; }
+      .comment .del { margin-left: auto; }
+      .sheet { position: fixed; inset: 0; background: var(--overlay); display: grid; place-items: center; padding: 18px; z-index: 60; }
+      .sheet-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: min(470px, 100%); box-shadow: 0 24px 70px rgba(9, 30, 52, 0.3); max-height: 90vh; overflow: auto; }
+      .sheet-card h2 { margin: 0 0 3px; font-size: 16px; }
+      .sheet-card .sub { color: var(--text-3); font-size: 12.5px; margin: 0 0 14px; }
+      .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+      .toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 90; }
+      .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(9, 30, 52, 0.16); }
+      .toast.bad { border-left-color: var(--danger); }
+      .empty-state { text-align: center; padding: 40px 10px; color: var(--text-3); }
+      .empty-state i { font-size: 26px; display: block; margin-bottom: 10px; opacity: 0.6; }
+      .empty-state p { margin: 0 0 12px; font-size: 13px; }
+      .check { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-2); }
+      @media (max-width: 780px) { .app { grid-template-columns: 1fr; } .rail { border-right: 0; border-bottom: 1px solid var(--border); } .pane { padding: 18px; } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="rail">
+        <div class="brand"><i class="fa-solid fa-clapperboard"></i> Studio</div>
+        <p class="hint" style="margin: 0">Share links and file review, without leaving your cloud.</p>
+        <button class="btn primary sm" id="new-link"><i class="fa-solid fa-link"></i> New share link</button>
+        <nav class="nav" aria-label="Studio sections">
+          <button data-tab="links" aria-current="true"><i class="fa-solid fa-link"></i> Share links</button>
+          <button data-tab="review"><i class="fa-regular fa-comments"></i> Review</button>
+        </nav>
+        <span class="grow"></span>
+        <p class="hint" style="margin: 0"><i class="fa-solid fa-lock"></i> Links are unguessable tokens</p>
+      </aside>
+      <main class="pane">
+        <div class="head">
+          <div>
+            <h1 id="title">Share links</h1>
+            <p id="subtitle">Publish, expire and revoke the links you handed out.</p>
+          </div>
+          <button class="btn quiet sm" id="refresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div id="view"><div class="skeleton" style="height:120px"></div></div>
+      </main>
+    </div>
+    <div id="modal-root"></div>
+    <div class="toasts" id="toast-root"></div>
+
+    <script type="module">
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const esc = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+      const when = (iso) => {
+        if (!iso) return 'never';
+        const date = new Date(iso);
+        return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      try {
+        document.documentElement.dataset.theme = window.parent.document.documentElement.dataset.theme || 'light';
+      } catch {
+        /* standalone */
+      }
+
+      let tab = 'links';
+      let shares = [];
+      let reviewPath = '';
+      let comments = [];
+
+      async function api(path, { method = 'GET', body } = {}) {
+        const init = { method, credentials: 'same-origin', headers: {} };
+        if (body !== undefined) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, init);
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+        if (!response.ok) {
+          const error = new Error(data?.error || `Request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+        return data || {};
+      }
+
+      function toast(message, bad = false) {
+        const node = document.createElement('div');
+        node.className = `toast${bad ? ' bad' : ''}`;
+        node.textContent = message;
+        $('#toast-root').appendChild(node);
+        setTimeout(() => node.remove(), bad ? 6000 : 3000);
+      }
+
+      function sheet({ title, sub = '', body, submit = 'Save', onSubmit }) {
+        const wrap = document.createElement('div');
+        wrap.className = 'sheet';
+        wrap.innerHTML = `<form class="sheet-card">
+          <h2>${esc(title)}</h2>
+          ${sub ? `<p class="sub">${esc(sub)}</p>` : ''}
+          ${body}
+          <div class="actions">
+            <button type="button" class="btn ghost" data-close>Cancel</button>
+            <button type="submit" class="btn primary">${esc(submit)}</button>
+          </div>
+        </form>`;
+        const close = () => wrap.remove();
+        wrap.addEventListener('mousedown', (event) => {
+          if (event.target === wrap) close();
+        });
+        wrap.querySelector('[data-close]').addEventListener('click', close);
+        wrap.querySelector('form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const button = wrap.querySelector('button[type="submit"]');
+          button.disabled = true;
+          try {
+            await onSubmit(wrap);
+            close();
+          } catch (error) {
+            toast(error.message, true);
+            button.disabled = false;
+          }
+        });
+        $('#modal-root').appendChild(wrap);
+        setTimeout(() => wrap.querySelector('input, textarea, select')?.focus(), 30);
+      }
+
+      function render() {
+        document.querySelectorAll('.rail [data-tab]').forEach((node) => node.setAttribute('aria-current', String(node.dataset.tab === tab)));
+        $('#title').textContent = tab === 'links' ? 'Share links' : 'Review';
+        $('#subtitle').textContent =
+          tab === 'links' ? 'Publish, expire and revoke the links you handed out.' : 'Read and reply to file comments, one path at a time.';
+        if (tab === 'links') renderLinks();
+        else renderReview();
+      }
+
+      async function loadShares() {
+        try {
+          const data = await api('/api/files/shares');
+          shares = data.shares || [];
+        } catch (error) {
+          toast(error.message, true);
+          shares = [];
+        }
+        renderLinks();
+      }
+
+      function renderLinks() {
+        const active = shares.filter((share) => !share.expiresAt || new Date(share.expiresAt) > new Date());
+        $('#view').innerHTML = `
+          <p class="hint" style="margin:0 0 12px">${shares.length} link${shares.length === 1 ? '' : 's'} · ${active.length} still open · links are shown only to you</p>
+          <div class="stack-2">
+            ${
+              shares.length
+                ? shares
+                    .map(
+                      (share) => `<div class="link-row">
+                        <span class="ico">${share.kind === 'folder' ? '<i class="fa-solid fa-folder"></i>' : '<i class="fa-regular fa-file"></i>'}</span>
+                        <div class="grow" style="min-width:0">
+                          <div class="strong small truncate">${esc(share.path)}</div>
+                          <div class="meta mono truncate">${esc(share.token)}</div>
+                          <div class="meta">Expires ${esc(when(share.expiresAt))}${share.hasPassword ? ' · password' : ''}${share.allowUpload ? ' · uploads allowed' : ''}${!share.expiresAt || new Date(share.expiresAt) > new Date() ? '' : ' · <span style="color:var(--danger)">expired</span>'}</div>
+                        </div>
+                        <button class="btn quiet sm" data-copy="${esc(share.url)}"><i class="fa-solid fa-copy"></i> Copy</button>
+                        <button class="btn ghost icon sm" data-open="${esc(share.url)}" aria-label="Open link"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                        <button class="btn ghost icon sm" data-revoke="${esc(share.token)}" aria-label="Revoke link"><i class="fa-solid fa-link-slash"></i></button>
+                      </div>`
+                    )
+                    .join('')
+                : `<div class="card empty-state"><i class="fa-solid fa-link"></i><p>No share links yet. Create one for a folder you need to hand over.</p><button class="btn primary sm" data-new-link>New share link</button></div>`
+            }
+          </div>`;
+        $('#view').querySelectorAll('[data-copy]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            const url = new URL(node.dataset.copy, location.origin).href;
+            try {
+              await navigator.clipboard.writeText(url);
+              toast('Link copied');
+            } catch {
+              toast(url);
+            }
+          })
+        );
+        $('#view').querySelectorAll('[data-open]').forEach((node) =>
+          node.addEventListener('click', () => window.open(new URL(node.dataset.open, location.origin).href, '_blank', 'noopener'))
+        );
+        $('#view').querySelectorAll('[data-revoke]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            if (!confirm('Revoke this link? Anyone holding it loses access immediately.')) return;
+            try {
+              await api(`/api/files/share/${encodeURIComponent(node.dataset.revoke)}`, { method: 'DELETE' });
+              toast('Link revoked');
+              loadShares();
+            } catch (error) {
+              toast(error.message, true);
+            }
+          })
+        );
+        $('#view').querySelector('[data-new-link]')?.addEventListener('click', () => newLink());
+      }
+
+      function newLink() {
+        sheet({
+          title: 'New share link',
+          sub: 'Point at a file or folder you can manage in Files.',
+          body: `<div class="stack-3">
+            <div class="field"><label class="label">Path in Files</label><input class="input" name="path" placeholder="Documents/Proposal.pdf" required /></div>
+            <div class="field-row"><div class="field"><label class="label">Expires in (days)</label><input class="input" type="number" min="0" max="365" name="expiresDays" placeholder="0 = never" /></div>
+            <div class="field"><label class="label">Password (optional)</label><input class="input" type="password" name="password" autocomplete="new-password" /></div></div>
+            <label class="check"><input type="checkbox" name="allowUpload" /> Allow uploads to this link</label>
+          </div>`,
+          submit: 'Create link',
+          onSubmit: async (wrap) => {
+            const form = wrap.querySelector('form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            if (!String(data.path).trim()) throw new Error('A path is required');
+            const result = await api('/api/files/share', {
+              method: 'POST',
+              body: {
+                path: String(data.path).trim(),
+                expiresDays: Number(data.expiresDays) || 0,
+                password: String(data.password || ''),
+                allowUpload: form.allowUpload.checked
+              }
+            });
+            toast('Share link created');
+            await navigator.clipboard?.writeText(new URL(result.url, location.origin).href).catch(() => undefined);
+            loadShares();
+          }
+        });
+      }
+
+      async function renderReview() {
+        $('#view').innerHTML = `
+          <form class="dash-search" id="review-form" style="max-width:none;margin-bottom:14px">
+            <i class="fa-regular fa-file"></i>
+            <input id="review-path" placeholder="Path in Files, e.g. Documents/notes.md" value="${esc(reviewPath)}" />
+            <button class="btn primary sm" type="submit">Open thread</button>
+          </form>
+          <div id="thread"></div>`;
+        $('#review-form').addEventListener('submit', (event) => {
+          event.preventDefault();
+          reviewPath = $('#review-path').value.trim();
+          loadComments();
+        });
+        if (!reviewPath) {
+          $('#thread').innerHTML = `<div class="card empty-state"><i class="fa-regular fa-comments"></i><p>Give a path to read its comment thread.</p></div>`;
+          return;
+        }
+        $('#thread').innerHTML = `<div class="skeleton" style="height:90px"></div>`;
+        await loadComments();
+      }
+
+      async function loadComments() {
+        if (!reviewPath) return;
+        try {
+          const data = await api(`/api/files/comments?path=${encodeURIComponent(reviewPath)}`);
+          comments = data.comments || [];
+          paintThread();
+        } catch (error) {
+          $('#thread').innerHTML = `<div class="note error">${esc(error.message)}</div>`;
+        }
+      }
+
+      function paintThread() {
+        $('#thread').innerHTML = `
+          <p class="hint" style="margin:0 0 10px">${comments.length} comment${comments.length === 1 ? '' : 's'} on <span class="mono">${esc(reviewPath)}</span></p>
+          <div class="stack-2" style="margin-bottom:12px">
+            ${comments
+              .map(
+                (comment) => `<article class="comment">
+                  <div class="who">${esc(comment.author || 'Someone')}<span>${esc(when(comment.createdAt))}</span>
+                    <button class="btn ghost icon sm del" data-del-comment="${esc(comment.id)}" aria-label="Delete comment"><i class="fa-solid fa-xmark"></i></button>
+                  </div>
+                  <p>${esc(comment.body)}</p>
+                </article>`
+              )
+              .join('') || '<p class="hint">No comments yet.</p>'}
+          </div>
+          <form id="comment-form" class="stack-2">
+            <textarea class="input" id="comment-body" rows="3" placeholder="Write a comment for the team..."></textarea>
+            <div class="row" style="justify-content:flex-end"><button class="btn primary sm" type="submit"><i class="fa-solid fa-paper-plane"></i> Comment</button></div>
+          </form>`;
+        $('#thread').querySelectorAll('[data-del-comment]').forEach((node) =>
+          node.addEventListener('click', async () => {
+            try {
+              await api(`/api/files/comments/${encodeURIComponent(node.dataset.delComment)}`, { method: 'DELETE' });
+              loadComments();
+            } catch (error) {
+              toast(error.message, true);
+            }
+          })
+        );
+        $('#comment-form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const body = $('#comment-body').value.trim();
+          if (!body) return;
+          try {
+            const data = await api('/api/files/comments', { method: 'POST', body: { path: reviewPath, body } });
+            comments = data.comments || [];
+            paintThread();
+            toast('Comment added');
+          } catch (error) {
+            toast(error.message, true);
+          }
+        });
+      }
+
+      document.querySelectorAll('.rail [data-tab]').forEach((node) =>
+        node.addEventListener('click', () => {
+          tab = node.dataset.tab;
+          render();
+        })
+      );
+      $('#new-link').addEventListener('click', () => newLink());
+      $('#refresh').addEventListener('click', () => {
+        if (tab === 'links') loadShares();
+        else loadComments();
+      });
+      loadShares();
+    </script>
+  </body>
+</html>

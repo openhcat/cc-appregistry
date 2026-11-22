@@ -1,0 +1,14 @@
+{
+  "id": "cc:editor",
+  "name": "Editor",
+  "developer": "cc",
+  "version": "2.0.0",
+  "description": "Text and Markdown editing in the browser, plus office documents through Collabora.",
+  "icon": "fa-solid fa-pen-nib",
+  "accent": "editor",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "builtin": true,
+  "runtime": "core",
+  "permissions": ["files:read", "files:write"]
+}

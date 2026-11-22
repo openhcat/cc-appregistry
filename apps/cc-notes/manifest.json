@@ -1,0 +1,14 @@
+{
+  "id": "cc:notes",
+  "name": "Notes",
+  "developer": "cc",
+  "version": "1.0.0",
+  "description": "Markdown notes with live preview, kept to your account.",
+  "icon": "fa-solid fa-note-sticky",
+  "accent": "notes",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "runtime": "external",
+  "permissions": ["storage"],
+  "website": "https://coolcloud.odoo.com"
+}

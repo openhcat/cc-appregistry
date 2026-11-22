@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Publish an app · CoolCloud App Registry</title>
+    <meta name="description" content="How to package a CoolCloud app, test it locally, and publish it to the official registry." />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body>
+    <header class="site">
+      <div class="wrap">
+        <span class="mark">CC</span>
+        <div class="brandline">
+          <b>CoolCloud App Registry</b>
+          <span>Official registry · opencloud umbrella</span>
+        </div>
+        <nav aria-label="Registry">
+          <a href="./">Explore</a>
+          <a class="active" href="publish.html">Publish an app</a>
+          <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="doc">
+        <span class="eyebrow"><i class="fa-solid fa-upload"></i> Publishing guide</span>
+        <h1>Publish an app to the registry</h1>
+        <p>
+          A CoolCloud app is a folder with a <code>manifest.json</code> and a web entry point. There is no build step, no
+          bundler and no SDK to install: the app runs same-origin in a sandboxed frame and talks to the normal HTTP API
+          with the signed-in session.
+        </p>
+
+        <div class="callout">
+          <b>Before you start.</b> Apps are code that people install on their own servers. Publish something you would
+          run yourself, keep it small, and state which API endpoints it uses. The registry is a catalogue, not a security
+          review.
+        </div>
+
+        <h2>1. Create the app folder</h2>
+        <p>The smallest useful app is three files:</p>
+        <pre><code>my-app/
+├── manifest.json
+├── README.md
+└── web/
+    └── index.html      # markup, styles and the app script</code></pre>
+        <p>
+          Split <code>index.html</code> into <code>app.js</code> and <code>app.css</code> if it grows. Relative paths
+          work inside <code>web/</code>.
+        </p>
+
+        <h2>2. Write manifest.json</h2>
+        <pre><code>{
+  "id": "acme:notes",
+  "name": "Notes",
+  "developer": "acme",
+  "version": "1.2.0",
+  "description": "Shared notes for the team, stored in Files.",
+  "icon": "fa-solid fa-note-sticky",
+  "accent": "editor",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "permissions": ["storage"],
+  "website": "https://acme.example/notes"
+}</code></pre>
+        <table>
+          <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>yes</td><td><code>developer:name</code>, lowercase, unique in the registry</td></tr>
+            <tr><td><code>name</code></td><td>yes</td><td>Shown in the app drawer and settings</td></tr>
+            <tr><td><code>developer</code></td><td>yes</td><td>Your namespace; matches the id prefix</td></tr>
+            <tr><td><code>version</code></td><td>yes</td><td>Semver. Bump it on every published change</td></tr>
+            <tr><td><code>description</code></td><td>yes</td><td>One sentence, under 140 characters</td></tr>
+            <tr><td><code>icon</code></td><td>yes</td><td>A Font Awesome class, for example <code>fa-solid fa-cube</code></td></tr>
+            <tr><td><code>entry</code></td><td>yes</td><td>Usually <code>web/index.html</code></td></tr>
+            <tr><td><code>permissions</code></td><td>no</td><td>Only what the app truly needs: <code>storage</code>, <code>files:read</code>, …</td></tr>
+            <tr><td><code>accent</code></td><td>no</td><td>An app accent name: <code>files</code>, <code>calendar</code>, <code>editor</code>, …</td></tr>
+            <tr><td><code>category</code></td><td>no</td><td>One of the registry categories, or a new one you propose</td></tr>
+            <tr><td><code>type</code></td><td>no</td><td><code>app</code> (default) or <code>widget</code> for the home page</td></tr>
+          </tbody>
+        </table>
+
+        <h2>3. Build it like it belongs</h2>
+        <p>Load the design system instead of inventing a second one:</p>
+        <pre><code>&lt;link rel="stylesheet" href="/vendor/fa/css/all.min.css" /&gt;
+&lt;link rel="stylesheet" href="/vendor/fonts/inter.css" /&gt;
+&lt;link rel="stylesheet" href="/css/tokens.css" /&gt;
+&lt;link rel="stylesheet" href="/css/base.css" /&gt;
+&lt;link rel="stylesheet" href="/css/components.css" /&gt;</code></pre>
+        <p>
+          The frame is same-origin, so <code>fetch('/api/...', { credentials: 'same-origin' })</code> works and the
+          session cookie comes along. Use the user's theme:
+        </p>
+        <pre><code>try {
+  document.documentElement.dataset.theme =
+    window.parent.document.documentElement.dataset.theme || 'light';
+} catch {
+  /* opened outside CoolCloud */
+}</code></pre>
+
+        <h2>4. Store app data the supported way</h2>
+        <p>
+          Declare <code>"permissions": ["storage"]</code>. The first run asks the user to allow storage; after that,
+          read and write JSON under your own app id and the signed-in user:
+        </p>
+        <pre><code>const read = await fetch('/api/apps/acme:notes/storage', { credentials: 'same-origin' });
+const { data } = await read.json();
+
+await fetch('/api/apps/acme:notes/storage', {
+  method: 'PUT',
+  credentials: 'same-origin',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ key: 'state', value: JSON.stringify({ notes: [] }) })
+});</code></pre>
+        <p>
+          Values are capped at 200 KB each. A 403 with <code>consentRequired</code> means the user has not granted
+          storage yet; show them a button and POST <code>{ "scopes": ["storage"] }</code> to
+          <code>/api/apps/&lt;id&gt;/grants</code>.
+        </p>
+        <p>
+          Files, calendar, mail and the rest are available through the normal endpoints when the user has access. Never
+          assume more access than the signed-in user already has — the server enforces ACLs on every call.
+        </p>
+
+        <h2>5. Test it on a real instance</h2>
+        <div class="steps">
+          <div class="step">
+            <b>Install from the folder</b>
+            <p><code>coolcloud --install acme:notes dir=./my-app</code></p>
+          </div>
+          <div class="step">
+            <b>Open it</b>
+            <p>It appears in All apps. Check light and dark, a narrow window, and the permission prompt.</p>
+          </div>
+          <div class="step">
+            <b>Check the console</b>
+            <p>No errors, no requests to third-party hosts you did not disclose, and no secrets in <code>web/</code>.</p>
+          </div>
+        </div>
+
+        <h2>6. Publish it</h2>
+        <p>
+          The official registry lists entries that point at a repository and the folder inside it. A pull request to
+          <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">openhcat/cc-appregistry</a>
+          that adds your entry to <code>registry.json</code> is the whole process.
+        </p>
+        <pre><code>{
+  "id": "acme:notes",
+  "name": "Notes",
+  "developer": "acme",
+  "version": "1.2.0",
+  "description": "Shared notes for the team, stored in Files.",
+  "icon": "fa-solid fa-note-sticky",
+  "accent": "editor",
+  "category": "Productivity",
+  "runtime": "external",
+  "repo": "https://github.com/acme/coolcloud-notes.git",
+  "path": ".",
+  "files": ["manifest.json", "web/index.html", "README.md"],
+  "tags": ["notes", "collaboration"]
+}</code></pre>
+        <p>
+          <code>path</code> is the folder inside the repository that holds <code>manifest.json</code>. If you host the
+          app inside a monorepo, point at the subfolder. <code>files</code> is the list the installer downloads when it
+          cannot clone the repository; keep it complete.
+        </p>
+
+        <h2>Review checklist</h2>
+        <ul>
+          <li>The manifest id is unique and the version is bumped.</li>
+          <li>The app has a README that says what it stores and which endpoints it calls.</li>
+          <li>No API keys, tokens or private URLs anywhere under <code>web/</code>.</li>
+          <li>Permissions are minimal; storage is requested only if the app really stores data.</li>
+          <li>It works with the keyboard, at 360 px wide, and in both themes.</li>
+          <li>You have installed it from your own folder and used it end to end.</li>
+        </ul>
+
+        <div class="callout">
+          Your own registry is always allowed. Point <b>Admin → App Store → Add registry</b> at any JSON file with this
+          shape — internal tools do not need to be published here.
+        </div>
+
+        <div class="cta-row">
+          <a class="btn primary" href="https://github.com/openhcat/cc-appregistry#publishing" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-github"></i> Open a pull request
+          </a>
+          <a class="btn" href="./">Browse the registry</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site">
+      <div class="wrap">
+        <span>Official CoolCloud App Registry</span>
+        <span>·</span>
+        <a href="./">Explore</a>
+        <span>·</span>
+        <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">Source</a>
+      </div>
+    </footer>
+  </body>
+</html>

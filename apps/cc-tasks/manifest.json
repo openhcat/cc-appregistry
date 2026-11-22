@@ -1,0 +1,14 @@
+{
+  "id": "cc:tasks",
+  "name": "Tasks",
+  "developer": "cc",
+  "version": "2.0.0",
+  "description": "The base task list: what you owe yourself, with due dates and priorities.",
+  "icon": "fa-solid fa-list-check",
+  "accent": "tasks",
+  "category": "Productivity",
+  "entry": "web/index.html",
+  "builtin": true,
+  "runtime": "core",
+  "permissions": ["tasks:read", "tasks:write"]
+}
