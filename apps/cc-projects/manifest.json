@@ -11,5 +11,5 @@
   "runtime": "external",
   "essentials": true,
   "permissions": ["storage"],
-  "website": "https://openhcat.github.io/cc-appregistry/"
+  "website": "https://openhcat.github.io/coolcloud-homepage/"
 }

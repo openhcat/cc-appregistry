@@ -3,406 +3,84 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CoolCloud — your cloud, your rules</title>
+    <title>Official CoolCloud App Registry</title>
     <meta
       name="description"
-      content="CoolCloud is a self-hosted collaboration suite: files, calendar, mail, contacts, documents, tasks, chat and apps on your own server. Community is free; Enterprise adds CC Defender, SSO, encryption and the full app suite."
+      content="Browse every CoolCloud app, copy the install command, and publish your own app to the official registry."
     />
-    <meta name="theme-color" content="#f6f9fc" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230b5fb0'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3ECC%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="assets/site.css" />
-    <link rel="stylesheet" href="assets/home.css" />
   </head>
-  <body class="marketing">
-    <a class="mkt-skip" href="#main">Skip to content</a>
-
-    <header class="mkt-header">
+  <body>
+    <header class="site">
       <div class="wrap">
-        <a class="mkt-brand" href="./" aria-label="CoolCloud home">
-          <span class="mark">CC</span>
-          <span>CoolCloud<small>Community 2.0</small></span>
-        </a>
-        <nav class="mkt-nav" id="mkt-nav" aria-label="Main">
-          <a href="#product">Product</a>
-          <a href="security.html">CC Defender</a>
-          <a href="#apps">Apps</a>
-          <a href="#editions">Editions</a>
-          <a href="#install">Install</a>
-          <a href="publish.html">Developers</a>
-          <a href="https://github.com/openhcat/CoolCloud-Community" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </nav>
-        <div class="mkt-head-actions">
-          <a class="mkt-btn sm" href="#install"><i class="fa-solid fa-download"></i> Install free</a>
-          <a class="mkt-btn primary sm" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise">Get Enterprise</a>
-          <button class="mkt-burger" id="mkt-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mkt-nav">
-            <i class="fa-solid fa-bars"></i>
-          </button>
+        <span class="mark">CC</span>
+        <div class="brandline">
+          <b>CoolCloud App Registry</b>
+          <span>Official registry · opencloud umbrella</span>
         </div>
+        <nav aria-label="Registry">
+          <a href="https://openhcat.github.io/coolcloud-homepage/">CoolCloud</a>
+          <a class="active" href="./">Apps</a>
+          <a href="publish.html">Publish an app</a>
+          <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
       </div>
     </header>
 
-    <main id="main">
-      <section class="masthead">
-        <div class="wrap">
-          <div>
-            <span class="mkt-eyebrow"><span class="dot"></span> Self-hosted · Community is free</span>
-            <h1>Your cloud. <em>Your rules.</em></h1>
-            <p class="lede">
-              Files, mail, calendar, contacts, documents, tasks and team chat in one server you own. Install it in
-              minutes, run it on your own hardware, and keep every byte where it belongs.
-            </p>
-            <div class="mkt-actions">
-              <a class="mkt-btn primary" href="#install"><i class="fa-solid fa-terminal"></i> Install CoolCloud</a>
-              <a class="mkt-btn" href="#apps"><i class="fa-solid fa-store"></i> Explore the apps</a>
-              <a class="mkt-btn ghost" href="security.html"><i class="fa-solid fa-shield-virus"></i> Meet CC Defender</a>
-            </div>
-            <div class="mkt-trust">
-              <div><b>23</b> catalogue apps</div>
-              <div><b>MIT</b> Community licence</div>
-              <div><b>AES-256-GCM</b> Enterprise encryption</div>
-              <div><b>0</b> vendor lock-in</div>
-            </div>
-          </div>
-
-          <div class="mock" aria-hidden="true">
-            <div class="mock-bar"><i></i><i></i><i></i><span class="mock-url">https://cloud.your-company.com/#/home</span></div>
-            <div class="mock-body">
-              <div class="mock-side">
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="mock-main">
-                <div class="mock-title">Good morning, Alex</div>
-                <div class="mock-sub">Your workspace · everything in one place</div>
-                <div class="mock-row">
-                  <div class="mock-card"><b>128</b><span>Files</span></div>
-                  <div class="mock-card"><b>14</b><span>Tasks</span></div>
-                  <div class="mock-card"><b>3</b><span>Meetings</span></div>
-                </div>
-                <div class="mock-list">
-                  <div class="mock-line"><i></i><em></em></div>
-                  <div class="mock-line"><i></i><em></em></div>
-                  <div class="mock-line small"><i></i><em></em></div>
-                </div>
-              </div>
-            </div>
-            <span class="mock-badge"><i class="fa-solid fa-lock"></i> Protected by CC Defender</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="mkt-section" id="product">
-        <div class="wrap">
-          <div class="mkt-section-head center reveal">
-            <span class="mkt-kicker">One server, every tool</span>
-            <h2>The suite your team already knows how to use.</h2>
-            <p>No per-seat tax, no data mine, no ten different subscriptions. CoolCloud is a complete workspace with a clean, fast interface.</p>
-          </div>
-
-          <div class="mkt-grid three">
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-regular fa-folder-open"></i></span>
-              <h3>Files &amp; sharing</h3>
-              <p>Drag-and-drop uploads, versions, tags, comments, expiring share links, permissions and a 30-day trash.</p>
-              <span class="code-inline">cc:files</span>
-            </article>
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-regular fa-envelope"></i></span>
-              <h3>Mail that stays yours</h3>
-              <p>IMAP/SMTP accounts, signatures, drafts, attachments and sent-mail history stored inside your instance.</p>
-              <span class="code-inline">cc:mail</span>
-            </article>
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-regular fa-calendar"></i></span>
-              <h3>Calendar &amp; tasks</h3>
-              <p>Shared calendars, recurring events, reminders, assignees and task lists that follow the work.</p>
-              <span class="code-inline">cc:calendar · cc:tasks</span>
-            </article>
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-solid fa-file-lines"></i></span>
-              <h3>Documents &amp; Office</h3>
-              <p>Write in the built-in editor or open DOCX, XLSX and PPTX through the optional Collabora container.</p>
-              <span class="code-inline">cc:editor · cc:office</span>
-            </article>
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-regular fa-comments"></i></span>
-              <h3>Connect</h3>
-              <p>Team rooms and direct messages with live presence, attachments and a searchable history.</p>
-              <span class="code-inline">cc:connect</span>
-            </article>
-            <article class="mkt-feature reveal">
-              <span class="mkt-ico"><i class="fa-solid fa-user-group"></i></span>
-              <h3>People &amp; teams</h3>
-              <p>Contacts, team rosters, file ACLs and role-based access. Every action lands in the audit log.</p>
-              <span class="code-inline">cc:contacts · teams</span>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="defender-band" id="defender">
-        <div class="wrap">
-          <div class="reveal">
-            <span class="mkt-eyebrow"><i class="fa-solid fa-shield-virus"></i> CC Defender · Enterprise</span>
-            <h2>Security that sits <span>in front of everything.</span></h2>
-            <p>
-              A hardened layer around the whole product — web, API and CLI. CC Defender checks every request before it
-              touches an app, blocks brute force, and turns bad addresses away at the door.
-            </p>
-            <ul class="defender-list">
-              <li><i class="fa-solid fa-check"></i> Login lockout after repeated failures, persisted across restarts</li>
-              <li><i class="fa-solid fa-check"></i> Allow lists, deny lists, CIDR ranges and blocked countries</li>
-              <li><i class="fa-solid fa-check"></i> IP intelligence on every tab open, with a 24-hour cache</li>
-              <li><i class="fa-solid fa-check"></i> Instant redirect to a branded block page — CLI and API included</li>
-              <li><i class="fa-solid fa-check"></i> AES-256-GCM encryption for secrets and app data at rest</li>
-            </ul>
-            <div class="defender-actions">
-              <a class="mkt-btn light" href="security.html"><i class="fa-solid fa-arrow-right"></i> How CC Defender works</a>
-              <a class="mkt-btn on-dark" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CC%20Defender%20Enterprise">Ask about Enterprise</a>
-            </div>
-          </div>
-
-          <div class="defender-panel reveal" aria-label="CC Defender activity example">
-            <div class="defender-panel-head">
-              <i class="fa-solid fa-shield-halved"></i> Defender console
-              <span class="live">Protection active</span>
-            </div>
-            <div class="defender-rows">
-              <div class="defender-row"><i class="fa-solid fa-globe"></i><code>198.51.100.24</code><span class="pill allow">Allowed</span></div>
-              <div class="defender-row"><i class="fa-solid fa-globe"></i><code>203.0.113.9</code><span class="pill deny">Blocked · deny list</span></div>
-              <div class="defender-row"><i class="fa-solid fa-key"></i><span>5 failed sign-ins · 10.0.0.14</span><span class="pill warn">Locked 30m</span></div>
-              <div class="defender-row"><i class="fa-solid fa-location-dot"></i><code>198.51.100.24</code><span>Amsterdam, NL</span><span class="pill allow">Trusted</span></div>
-              <div class="defender-row"><i class="fa-solid fa-terminal"></i><span>CLI request refused</span><span class="pill deny">Policy</span></div>
-            </div>
-            <div class="defender-foot">
-              <span><b>1,284</b> requests checked</span>
-              <span><b>3</b> locked</span>
-              <span><b>0</b> reached an app</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="mkt-section alt" id="editions">
-        <div class="wrap">
-          <div class="mkt-section-head center reveal">
-            <span class="mkt-kicker">Two editions, one product</span>
-            <h2>Start free. Harden when you need to.</h2>
-            <p>Community is a complete workspace under MIT. Enterprise adds the controls, branding and apps that larger organizations ask for.</p>
-          </div>
-
-          <div class="plans">
-            <article class="plan reveal">
-              <span class="plan-kicker">Community</span>
-              <h3>Your own cloud, free forever</h3>
-              <div class="price">$0 <small>MIT licence</small></div>
-              <p>Everything a small team needs to leave the subscription treadmill. Self-hosted, no seat limits, no phone-home.</p>
-              <ul>
-                <li><i class="fa-solid fa-check"></i> Files, calendar, mail, contacts, editor and tasks</li>
-                <li><i class="fa-solid fa-check"></i> Connect chat, media, search and the App Store</li>
-                <li><i class="fa-solid fa-check"></i> 19 community and Essentials apps</li>
-                <li><i class="fa-solid fa-check"></i> Automatic updates from the registry</li>
-                <li><i class="fa-solid fa-check"></i> CC Defender available as an Enterprise layer</li>
-              </ul>
-              <a class="mkt-btn primary" href="#install"><i class="fa-solid fa-download"></i> Install Community</a>
-              <span class="plan-note">No account required. Runs on Node 24 with SQLite.</span>
-            </article>
-
-            <article class="plan featured reveal">
-              <span class="plan-kicker">Enterprise</span>
-              <h3>The full suite, with CC Defender</h3>
-              <div class="price">Let’s talk <small>annual licence</small></div>
-              <p>For organizations that need SSO, network policy, encryption, compliance and the deeper apps — with a white-label interface.</p>
-              <ul>
-                <li><i class="fa-solid fa-check"></i> CC Defender: lockouts, IP rules, country blocks, CLI guard</li>
-                <li><i class="fa-solid fa-check"></i> Single sign-on (OpenID Connect) and session policy</li>
-                <li><i class="fa-solid fa-check"></i> Encryption at rest and signed audit exports</li>
-                <li><i class="fa-solid fa-check"></i> Helpdesk, Inventory, Uptime &amp; Status, Wiki, full CRM/Finance</li>
-                <li><i class="fa-solid fa-check"></i> White-label name, logo and colours</li>
-                <li><i class="fa-solid fa-check"></i> Priority support and migration help</li>
-              </ul>
-              <a class="mkt-btn light" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise"><i class="fa-regular fa-paper-plane"></i> Contact Enterprise</a>
-              <span class="plan-note">Write to coolcloud.getenterprise@hatcat.me — we reply personally.</span>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="mkt-section" id="apps">
-        <div class="wrap">
-          <div class="mkt-section-head reveal">
-            <span class="mkt-kicker">Official app registry</span>
-            <h2>Every app, in one catalogue.</h2>
-            <p>Core apps ship with the server. Everything else installs from the registry in one command — or with a click in the App Store.</p>
-          </div>
-
-          <div class="catalog-shell">
-            <div class="catalog-head">
-              <label class="search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="search-input" placeholder="Search apps, tags or ids…" aria-label="Search apps" />
-              </label>
-              <span class="badge" id="count">Loading…</span>
-            </div>
-            <div class="chips" id="chips" role="group" aria-label="Categories"></div>
-            <div class="grid" id="grid" style="margin-top: 16px">
-              <div class="empty">Loading the registry…</div>
-            </div>
-            <div class="catalog-note">
-              <i class="fa-solid fa-building" style="margin-top:2px"></i>
-              <span>
-                Apps marked <strong>ENTERPRISE ONLY</strong> ship with CoolCloud Enterprise and are listed here for
-                reference. <a href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise">Contact us</a>
-                for access, or <a href="publish.html">publish your own app</a> to the public registry.
-              </span>
-            </div>
-          </div>
-
-          <div class="stats-row" style="margin-top:18px">
+    <main>
+      <div class="wrap">
+        <section class="hero">
+          <span class="eyebrow"><i class="fa-solid fa-store"></i> Official registry</span>
+          <h1>Apps for your CoolCloud.</h1>
+          <p>
+            Core apps ship with the server. Everything else installs from this catalogue — or with a click in the App
+            Store. Browse by category, copy an install command, or publish your own app.
+          </p>
+          <div class="stats-row">
             <div><b id="stat-apps">—</b> apps published</div>
             <div><b id="stat-core">—</b> core apps</div>
             <div><b id="stat-categories">—</b> categories</div>
             <div><b id="stat-updated">—</b> last update</div>
           </div>
-        </div>
-      </section>
-
-      <section class="mkt-section alt" id="install">
-        <div class="wrap">
-          <div class="mkt-section-head reveal">
-            <span class="mkt-kicker">Install</span>
-            <h2>From download to sign-in in minutes.</h2>
-            <p>CoolCloud runs on a small server, a NAS, a VPS or a spare computer. Node 24 and SQLite are the only hard requirements.</p>
+          <div class="cta-row">
+            <a class="btn primary" href="publish.html"><i class="fa-solid fa-upload"></i> Publish your app</a>
+            <a class="btn" href="registry.json"><i class="fa-solid fa-code"></i> registry.json</a>
+            <a class="btn" href="https://openhcat.github.io/coolcloud-homepage/"><i class="fa-solid fa-cloud"></i> CoolCloud homepage</a>
+            <a class="btn" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise"><i class="fa-solid fa-building"></i> Get Enterprise</a>
           </div>
+        </section>
 
-          <div class="install-grid">
-            <div class="install-steps">
-              <div class="install-step reveal">
-                <span class="install-num">1</span>
-                <div>
-                  <h3>Get the Community edition</h3>
-                  <p>Clone the repository (or download the ZIP) anywhere on the machine that will host it.</p>
-                </div>
-              </div>
-              <div class="install-step reveal">
-                <span class="install-num">2</span>
-                <div>
-                  <h3>Run the installer</h3>
-                  <p><code>node bin/coolcloud.js --install</code> asks for a location, organization, admin account and port, then prepares the instance.</p>
-                </div>
-              </div>
-              <div class="install-step reveal">
-                <span class="install-num">3</span>
-                <div>
-                  <h3>Start it</h3>
-                  <p><code>node bin/coolcloud.js --start</code> (or <code>npm start</code>) serves the interface at <code>http://localhost:8080</code>.</p>
-                </div>
-              </div>
-              <div class="install-step reveal">
-                <span class="install-num">4</span>
-                <div>
-                  <h3>Put it online, safely</h3>
-                  <p>Add a domain, TLS and a reverse proxy using the hosting guide. Then enable CC Defender on Enterprise for network policy.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="install-side">
-              <div class="terminal reveal">
-                <div class="terminal-head"><i></i><i></i><i></i> Terminal</div>
-                <pre><span class="comment"># 1 · get the code</span>
-<span class="prompt">$</span> git clone https://github.com/openhcat/CoolCloud-Community.git
-<span class="prompt">$</span> cd CoolCloud-Community
-
-<span class="comment"># 2 · create your instance</span>
-<span class="prompt">$</span> node bin/coolcloud.js --install
-
-<span class="comment"># 3 · start the server</span>
-<span class="prompt">$</span> node bin/coolcloud.js --start</pre>
-              </div>
-              <div class="install-card reveal">
-                <h3><i class="fa-solid fa-server" style="color:#0b5fa8"></i> What you need</h3>
-                <ul>
-                  <li>Node.js 24 or newer</li>
-                  <li>Any OS that runs Node — Linux, macOS, Windows</li>
-                  <li>Optional: Docker for the Collabora Office container</li>
-                  <li>Optional: a domain and reverse proxy for HTTPS</li>
-                </ul>
-              </div>
-              <div class="install-card reveal">
-                <h3><i class="fa-solid fa-book" style="color:#0b5fa8"></i> Guides</h3>
-                <p>
-                  Hosting, TLS, backups, the CLI and the app manifest format live in the
-                  <a href="https://github.com/openhcat/CoolCloud-Community/tree/main/docs" target="_blank" rel="noopener noreferrer">documentation folder</a>.
-                  Enterprise deployment help comes with the licence.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div class="toolbar">
+          <label class="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="search-input" placeholder="Search apps, tags or ids…" aria-label="Search apps" />
+          </label>
+          <span class="badge" id="count">Loading…</span>
         </div>
-      </section>
-
-      <section class="mkt-section tight">
-        <div class="wrap">
-          <div class="contact-band reveal">
-            <div>
-              <span class="mkt-eyebrow" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#eaf6ff">Talk to a human</span>
-              <h2>Enterprise, security reviews and migrations.</h2>
-              <p>
-                Tell us what you run today, how many people need access, and what your security team requires. We will
-                answer with a concrete plan — not a sales sequence.
-              </p>
-            </div>
-            <div class="contact-cards">
-              <a class="contact-card" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise">
-                <i class="fa-regular fa-paper-plane"></i>
-                <span><b>Enterprise &amp; CC Defender</b><span>coolcloud.getenterprise@hatcat.me</span></span>
-              </a>
-              <a class="contact-card" href="mailto:coolcloud.support@hatcat.me">
-                <i class="fa-regular fa-life-ring"></i>
-                <span><b>Support</b><span>coolcloud.support@hatcat.me</span></span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="mkt-footer">
-      <div class="wrap">
-        <div>
-          <a class="mkt-brand" href="./"><span class="mark">CC</span><span>CoolCloud<small>Your cloud, your rules</small></span></a>
-          <p>Self-hosted collaboration for teams that want their data on their own terms. Community is MIT; Enterprise is licensed per organization.</p>
-        </div>
-        <div>
-          <h4>Product</h4>
-          <a href="#product">Features</a>
-          <a href="security.html">CC Defender</a>
-          <a href="#apps">App catalogue</a>
-          <a href="#editions">Editions</a>
-          <a href="#install">Install</a>
-        </div>
-        <div>
-          <h4>Company</h4>
-          <a href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise">Enterprise contact</a>
-          <a href="mailto:coolcloud.support@hatcat.me">Support</a>
-          <a href="https://github.com/openhcat/CoolCloud-Community" target="_blank" rel="noopener noreferrer">Community source</a>
-          <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">Registry source</a>
-          <a href="publish.html">Publish an app</a>
+        <div class="chips" id="chips" role="group" aria-label="Categories"></div>
+        <div class="grid" id="grid" style="margin-top: 16px">
+          <div class="empty">Loading the registry…</div>
         </div>
       </div>
+    </main>
+
+    <footer class="site">
       <div class="wrap">
-        <div class="mkt-footer-bottom">
-          <span>© <span id="year">2026</span> CoolCloud</span>
-          <span>Community under MIT · Enterprise under a commercial licence</span>
-          <span>Built to be self-hosted.</span>
-        </div>
+        <span>Official CoolCloud App Registry</span>
+        <span>·</span>
+        <a href="https://openhcat.github.io/coolcloud-homepage/">CoolCloud</a>
+        <span>·</span>
+        <a href="publish.html">Publish an app</a>
+        <span>·</span>
+        <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">Source</a>
+        <span style="margin-left: auto">Apps are code you choose to trust. Read what you install.</span>
       </div>
     </footer>
 
