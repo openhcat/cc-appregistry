@@ -10,5 +10,5 @@
   "entry": "web/index.html",
   "runtime": "external",
   "permissions": ["files:read", "files:write"],
-  "website": "https://openhcat.github.io/coolcloud-homepage/"
+  "website": "https://coolcloud.odoo.com/"
 }
