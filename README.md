@@ -4,6 +4,7 @@ The registry CoolCloud installs its apps from. One JSON file lists every app; ea
 
 > **Get Enterprise for more apps.** Entries marked **ENTERPRISE ONLY** are catalogue listings: their code ships with [CoolCloud Enterprise](mailto:coolcloud.getenterprise@hatcat.me), not with this public registry.
 
+- **Product homepage:** https://openhcat.github.io/coolcloud-homepage/
 - **Browse:** https://openhcat.github.io/cc-appregistry/
 - **Registry file:** [`registry.json`](registry.json) — `https://raw.githubusercontent.com/openhcat/cc-appregistry/main/registry.json`
 - **Publishing guide:** https://openhcat.github.io/cc-appregistry/publish.html
