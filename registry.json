@@ -525,6 +525,9 @@
         "builder",
         "landing page",
         "publish"
+      ],
+      "permissions": [
+        "storage"
       ]
     }
   ]
