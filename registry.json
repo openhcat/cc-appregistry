@@ -457,7 +457,7 @@
       "category": "Business",
       "runtime": "external",
       "enterprise": true,
-      "contact": "https://coolcloud.odoo.com/contactus",
+      "contact": "mailto:coolcloud.getenterprise@hatcat.me",
       "minVersion": "2.0.0",
       "tags": [
         "helpdesk",
@@ -476,7 +476,7 @@
       "category": "Business",
       "runtime": "external",
       "enterprise": true,
-      "contact": "https://coolcloud.odoo.com/contactus",
+      "contact": "mailto:coolcloud.getenterprise@hatcat.me",
       "minVersion": "2.0.0",
       "tags": [
         "inventory",
@@ -495,7 +495,7 @@
       "category": "Business",
       "runtime": "external",
       "enterprise": true,
-      "contact": "https://coolcloud.odoo.com/contactus",
+      "contact": "mailto:coolcloud.getenterprise@hatcat.me",
       "minVersion": "2.0.0",
       "tags": [
         "uptime",

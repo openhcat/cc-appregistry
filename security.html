@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CC Defender — security for CoolCloud Enterprise</title>
+    <meta
+      name="description"
+      content="CC Defender is the CoolCloud Enterprise security layer: login lockouts, allow and deny lists, country rules, CLI protection, IP intelligence, encryption at rest and instant block pages."
+    />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230b5fb0'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3ECC%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="assets/site.css" />
+    <link rel="stylesheet" href="assets/home.css" />
+  </head>
+  <body class="marketing">
+    <a class="mkt-skip" href="#main">Skip to content</a>
+
+    <header class="mkt-header">
+      <div class="wrap">
+        <a class="mkt-brand" href="./" aria-label="CoolCloud home">
+          <span class="mark">CC</span>
+          <span>CoolCloud<small>Community 2.0</small></span>
+        </a>
+        <nav class="mkt-nav" id="mkt-nav" aria-label="Main">
+          <a href="index.html#product">Product</a>
+          <a href="security.html" aria-current="page">CC Defender</a>
+          <a href="index.html#apps">Apps</a>
+          <a href="index.html#editions">Editions</a>
+          <a href="index.html#install">Install</a>
+          <a href="publish.html">Developers</a>
+          <a href="https://github.com/openhcat/CoolCloud-Community" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+        <div class="mkt-head-actions">
+          <a class="mkt-btn sm" href="index.html#install"><i class="fa-solid fa-download"></i> Install free</a>
+          <a class="mkt-btn primary sm" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CC%20Defender%20Enterprise">Get Enterprise</a>
+          <button class="mkt-burger" id="mkt-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mkt-nav">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="security-hero">
+        <div class="wrap">
+          <span class="mkt-eyebrow"><i class="fa-solid fa-shield-virus"></i> CC Defender · Enterprise only</span>
+          <h1>Security in front of every request.</h1>
+          <p>
+            CC Defender is a hardened layer around CoolCloud. It runs before routing, before sessions, before apps and
+            before the CLI can do anything. If an address is not welcome, it never reaches your data.
+          </p>
+          <div class="mkt-actions">
+            <a class="mkt-btn primary" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CC%20Defender%20Enterprise"><i class="fa-regular fa-paper-plane"></i> Ask about Enterprise</a>
+            <a class="mkt-btn" href="#how"><i class="fa-solid fa-arrow-down"></i> See how it works</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section tight" style="padding-top:0">
+        <div class="wrap">
+          <div class="security-grid">
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-key"></i></span>
+              <h3>Brute-force lockout</h3>
+              <p>
+                Failed sign-ins are counted in SQLite, not memory. After the threshold the address is locked for a
+                configurable window — a server restart does not give an attacker a fresh start.
+              </p>
+            </article>
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-list-check"></i></span>
+              <h3>Allow and deny lists</h3>
+              <p>
+                Exact addresses and CIDR ranges. An allow list turns CoolCloud into a private network service; a deny
+                list shuts out known-bad addresses immediately. Allowed matches win over denies.
+              </p>
+            </article>
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-earth-europe"></i></span>
+              <h3>Country rules</h3>
+              <p>
+                Block whole countries by two-letter code. Address intelligence is cached for 24 hours, so the check is
+                fast and works even when the lookup service is unavailable.
+              </p>
+            </article>
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-terminal"></i></span>
+              <h3>CLI and API guard</h3>
+              <p>
+                The same policy covers the REST API and the remote CLI. A blocked address gets a clear refusal with the
+                block-page URL instead of a session, and admin commands cannot bypass it.
+              </p>
+            </article>
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-lock"></i></span>
+              <h3>Encryption at rest</h3>
+              <p>
+                AES-256-GCM seals mail passwords, authenticator secrets and app storage. The key stays on the server,
+                or outside the instance through <code>CC_MASTER_KEY</code>. The CLI token gets its own sealed store.
+              </p>
+            </article>
+            <article class="mkt-feature reveal">
+              <span class="mkt-ico"><i class="fa-solid fa-clipboard-list"></i></span>
+              <h3>Visible decisions</h3>
+              <p>
+                Every block, unblock and denial is written to the Defender log and the audit trail. Admins can look up
+                an address, see its network, and unblock it without touching the database.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section alt" id="how">
+        <div class="wrap">
+          <div class="mkt-section-head reveal">
+            <span class="mkt-kicker">Request lifecycle</span>
+            <h2>Four checks before anything loads.</h2>
+            <p>The guard is deliberately boring: one function, one decision, one place to audit.</p>
+          </div>
+
+          <div class="install-steps">
+            <div class="install-step reveal">
+              <span class="install-num">1</span>
+              <div>
+                <h3>Resolve the real address</h3>
+                <p>Forwarded headers are trusted only from a local reverse proxy, so a client cannot spoof its way past the policy.</p>
+              </div>
+            </div>
+            <div class="install-step reveal">
+              <span class="install-num">2</span>
+              <div>
+                <h3>Match the policy</h3>
+                <p>Allow list, localhost exemption, active lockout, deny list and cached country — in that order. When an allow list exists, everything not on it is refused.</p>
+              </div>
+            </div>
+            <div class="install-step reveal">
+              <span class="install-num">3</span>
+              <div>
+                <h3>Refuse before routing</h3>
+                <p>A browser is sent to a branded block page with the reason and retry time. An API or CLI call gets a JSON <code>403</code> with <code>code: "defender"</code>. No app code runs.</p>
+              </div>
+            </div>
+            <div class="install-step reveal">
+              <span class="install-num">4</span>
+              <div>
+                <h3>Keep watching</h3>
+                <p>Every tab open, focus and visibility change asks the server to re-check and enrich the address. A policy change takes effect on the next request, even in an open tab.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section">
+        <div class="wrap">
+          <div class="split">
+            <div class="reveal">
+              <span class="mkt-kicker">When an address is refused</span>
+              <h2 style="font-size:clamp(26px,3.4vw,38px);letter-spacing:-.03em;margin:10px 0 12px">A block page, not a stack trace.</h2>
+              <p style="color:#52677a;font-size:14.5px;line-height:1.7">
+                Visitors see what happened, their address, when to retry and a support link. No internal paths, no
+                version numbers, no hint about which accounts exist. The page is served by the server itself with a
+                strict content-security policy and no external assets.
+              </p>
+              <div class="callout-dark" style="margin-top:20px">
+                <h3><i class="fa-solid fa-shield-halved"></i> Configurable without a redeploy</h3>
+                <p style="margin:0">
+                  Thresholds, windows, lockout length, lists, countries and the localhost exemption are saved to
+                  <code>config.json</code> and applied live. The console refuses to save rules that would lock out the
+                  administrator making the change.
+                </p>
+              </div>
+            </div>
+
+            <div class="reveal">
+              <div class="mock" style="transform:none;background:#f2f7fc;border-color:#d8e5f0;box-shadow:0 24px 60px rgba(12,30,46,.12)">
+                <div class="mock-bar" style="background:#e5eef7;border-color:#d8e5f0"><i></i><i></i><i></i><span class="mock-url" style="background:#fff;color:#8aa0b3">https://cloud.example.com/blocked</span></div>
+                <div style="padding:28px;background:#fff">
+                  <span class="badge" style="background:rgba(163,50,44,.1);border-color:rgba(163,50,44,.25);color:#a3322c;font-weight:700">CC DEFENDER · BLOCKED</span>
+                  <h3 style="font-size:23px;letter-spacing:-.02em;margin:15px 0 8px;color:#0c1e2e">Too many failed sign-ins</h3>
+                  <p style="color:#52677a;font-size:13px;line-height:1.65;margin:0 0 16px">
+                    This address was temporarily locked after repeated failed sign-in attempts.
+                  </p>
+                  <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 14px;padding:13px;border:1px solid #dbe7f1;border-radius:10px;background:#f7fbff;font-size:11.5px">
+                    <span style="color:#7b91a4">Address</span><code style="color:#0c1e2e">203.0.113.9</code>
+                    <span style="color:#7b91a4">Retry after</span><span>14:32, today</span>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:16px">
+                    <span class="mkt-btn primary sm">Try again</span>
+                    <span class="mkt-btn sm">Contact support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section alt">
+        <div class="wrap">
+          <div class="split">
+            <div class="reveal">
+              <span class="mkt-kicker">Defaults</span>
+              <h2 style="font-size:clamp(26px,3.4vw,38px);letter-spacing:-.03em;margin:10px 0 12px">Safe on day one.</h2>
+              <p style="color:#52677a;font-size:14.5px;line-height:1.7">
+                CC Defender ships enabled on Enterprise. These defaults are deliberately firm but never lock out the
+                local administrator or the local CLI.
+              </p>
+              <div class="terminal" style="margin-top:20px">
+                <div class="terminal-head"><i></i><i></i><i></i> CLI · administrator</div>
+                <pre><span class="prompt">$</span> coolcloud --security status
+<span class="prompt">$</span> coolcloud --security allow 203.0.113.10
+<span class="prompt">$</span> coolcloud --security deny 198.51.100.0/24
+<span class="prompt">$</span> coolcloud --security block 203.0.113.9 --minutes=60
+<span class="prompt">$</span> coolcloud --security unblock 203.0.113.9
+<span class="prompt">$</span> coolcloud --security check 8.8.8.8</pre>
+              </div>
+            </div>
+
+            <div class="reveal">
+              <table class="policy-table">
+                <thead><tr><th>Setting</th><th>Default</th></tr></thead>
+                <tbody>
+                  <tr><td>Protection</td><td><code>enabled: true</code> on Enterprise</td></tr>
+                  <tr><td>Failed sign-ins</td><td>5 within 15 minutes</td></tr>
+                  <tr><td>Lockout</td><td>30 minutes, persisted in SQLite</td></tr>
+                  <tr><td>Localhost</td><td>Allowed by default (local CLI and office)</td></tr>
+                  <tr><td>Allow / deny lists</td><td>Empty; exact IPs and CIDR supported</td></tr>
+                  <tr><td>Countries</td><td>None blocked; two-letter codes</td></tr>
+                  <tr><td>Lookup</td><td>Country, city and network; cached 24h</td></tr>
+                  <tr><td>Encryption</td><td>AES-256-GCM; key file or <code>CC_MASTER_KEY</code></td></tr>
+                </tbody>
+              </table>
+              <p class="plan-note" style="margin-top:12px">All values change from Admin → CC Defender. Changes apply to the next request.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section">
+        <div class="wrap">
+          <div class="mkt-section-head center reveal">
+            <span class="mkt-kicker">Scope</span>
+            <h2>What CC Defender protects.</h2>
+            <p>Everything the server exposes — not only the sign-in screen.</p>
+          </div>
+          <div class="mkt-grid three">
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-window-maximize"></i></span><h3>Web interface</h3><p>Page loads, static assets, the App Store, public forms and published websites all pass the guard.</p></article>
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-code"></i></span><h3>REST API</h3><p>Blocked callers receive a JSON refusal before authentication, so no token is evaluated and no data is read.</p></article>
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-terminal"></i></span><h3>CLI</h3><p>Remote CLI sessions inherit the same policy. The CLI stores its token encrypted and reports the block URL.</p></article>
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-share-nodes"></i></span><h3>Public links</h3><p>Share links, published sites and form pages are server routes, so they cannot be used to bypass a deny rule.</p></article>
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-file-shield"></i></span><h3>Data at rest</h3><p>Secrets and app storage are sealed with authenticated encryption; tampering returns empty, never forged data.</p></article>
+            <article class="mkt-feature"><span class="mkt-ico"><i class="fa-solid fa-eye"></i></span><h3>Audit</h3><p>Defender events sit beside the normal audit trail, ready for CSV/JSON export into your SIEM.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="mkt-section tight">
+        <div class="wrap">
+          <div class="contact-band reveal">
+            <div>
+              <span class="mkt-eyebrow" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#eaf6ff">Enterprise only</span>
+              <h2>Bring CC Defender to your server.</h2>
+              <p>Tell us about your network, identity provider and compliance requirements. We will map the policy with you and help with the rollout.</p>
+            </div>
+            <div class="contact-cards">
+              <a class="contact-card" href="mailto:coolcloud.getenterprise@hatcat.me?subject=CC%20Defender%20Enterprise">
+                <i class="fa-regular fa-paper-plane"></i>
+                <span><b>Enterprise &amp; CC Defender</b><span>coolcloud.getenterprise@hatcat.me</span></span>
+              </a>
+              <a class="contact-card" href="mailto:coolcloud.support@hatcat.me">
+                <i class="fa-regular fa-life-ring"></i>
+                <span><b>Support</b><span>coolcloud.support@hatcat.me</span></span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mkt-footer">
+      <div class="wrap">
+        <div>
+          <a class="mkt-brand" href="./"><span class="mark">CC</span><span>CoolCloud<small>Your cloud, your rules</small></span></a>
+          <p>CC Defender is part of CoolCloud Enterprise. Community remains free, MIT-licensed and complete for small teams.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <a href="index.html#product">Features</a>
+          <a href="security.html">CC Defender</a>
+          <a href="index.html#apps">App catalogue</a>
+          <a href="index.html#editions">Editions</a>
+          <a href="index.html#install">Install</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise">Enterprise contact</a>
+          <a href="mailto:coolcloud.support@hatcat.me">Support</a>
+          <a href="https://github.com/openhcat/CoolCloud-Community" target="_blank" rel="noopener noreferrer">Community source</a>
+          <a href="https://github.com/openhcat/cc-appregistry" target="_blank" rel="noopener noreferrer">Registry source</a>
+          <a href="publish.html">Publish an app</a>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="mkt-footer-bottom">
+          <span>© <span id="year">2026</span> CoolCloud</span>
+          <span>Community under MIT · Enterprise under a commercial licence</span>
+          <span>Built to be self-hosted.</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/site.js"></script>
+  </body>
+</html>

@@ -11,5 +11,5 @@
   "runtime": "external",
   "permissions": ["storage"],
   "minVersion": "2.0.0",
-  "website": "https://coolcloud.odoo.com"
+  "website": "https://openhcat.github.io/cc-appregistry/"
 }

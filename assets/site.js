@@ -1,4 +1,5 @@
-/* Official CoolCloud App Registry — browse the registry.json catalog. */
+/* CoolCloud website + official app registry. */
+
 const grid = document.getElementById('grid');
 const chips = document.getElementById('chips');
 const search = document.getElementById('search-input');
@@ -8,9 +9,53 @@ const icon = (name) => (name && name.startsWith('fa-') ? `<i class="${name}"></i
 const escapeHtml = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
+const ENTERPRISE_CONTACT = 'mailto:coolcloud.getenterprise@hatcat.me?subject=CoolCloud%20Enterprise';
+
 let catalog = null;
 let category = 'All';
 let query = '';
+
+/* ------------------------------- site chrome ------------------------------ */
+
+function initChrome() {
+  const burger = document.getElementById('mkt-burger');
+  const nav = document.getElementById('mkt-nav');
+  if (burger && nav) {
+    burger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', String(open));
+      burger.innerHTML = `<i class="fa-solid ${open ? 'fa-xmark' : 'fa-bars'}"></i>`;
+    });
+    nav.querySelectorAll('a').forEach((link) =>
+      link.addEventListener('click', () => {
+        nav.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      })
+    );
+  }
+  const year = document.getElementById('year');
+  if (year) year.textContent = String(new Date().getFullYear());
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+    );
+    document.querySelectorAll('.reveal').forEach((node) => observer.observe(node));
+  } else {
+    document.querySelectorAll('.reveal').forEach((node) => node.classList.add('in'));
+  }
+}
+
+/* ------------------------------- catalogue -------------------------------- */
 
 function categoriesFor(apps) {
   const declared = Array.isArray(catalog.categories) ? catalog.categories.filter(Boolean) : [];
@@ -21,7 +66,7 @@ function categoriesFor(apps) {
 }
 
 function render() {
-  if (!catalog) return;
+  if (!catalog || !grid) return;
   const apps = catalog.apps || [];
   const list = apps
     .filter((app) => category === 'All' || app.category === category)
@@ -47,7 +92,13 @@ function render() {
             <p>${escapeHtml(app.description || '')}</p>
             <div class="foot">
               ${app.category ? `<span class="badge">${escapeHtml(app.category)}</span>` : ''}
-              ${app.enterprise ? '<span class="badge enterprise">enterprise only</span>' : app.runtime === 'core' ? '<span class="badge core">core</span>' : '<span class="badge">app</span>'}
+              ${
+                app.enterprise
+                  ? '<span class="badge enterprise">ENTERPRISE ONLY</span>'
+                  : app.runtime === 'core'
+                  ? '<span class="badge core">core</span>'
+                  : '<span class="badge">app</span>'
+              }
               ${app.essentials ? '<span class="badge essential">essentials</span>' : ''}
               ${app.beta ? '<span class="badge">beta</span>' : ''}
             </div>
@@ -55,13 +106,15 @@ function render() {
               app.enterprise
                 ? `<div class="code">Ships with CoolCloud Enterprise</div>
             <div class="foot">
-              <a class="copy" style="text-decoration:none" href="${escapeHtml(app.contact || 'https://coolcloud.odoo.com/contactus')}" target="_blank" rel="noopener noreferrer">Contact us</a>
-              <a class="copy" style="text-decoration:none" href="https://coolcloud.odoo.com" target="_blank" rel="noopener noreferrer">Get Enterprise</a>
+              <a class="copy" style="text-decoration:none" href="${escapeHtml(app.contact || ENTERPRISE_CONTACT)}">Contact us</a>
+              <a class="copy" style="text-decoration:none" href="${ENTERPRISE_CONTACT}">Get Enterprise</a>
             </div>`
                 : `<div class="code">coolcloud --install ${escapeHtml(app.id)}</div>
             <div class="foot">
               <button class="copy" data-copy="coolcloud --install ${escapeHtml(app.id)}">Copy install</button>
-              <a class="copy" style="text-decoration:none" href="https://github.com/openhcat/cc-appregistry/tree/main/${escapeHtml(app.path || '')}" target="_blank" rel="noopener noreferrer">Source</a>
+              <a class="copy" style="text-decoration:none" href="https://github.com/openhcat/cc-appregistry/tree/main/${escapeHtml(
+                app.path || ''
+              )}" target="_blank" rel="noopener noreferrer">Source</a>
             </div>`
             }
           </article>`
@@ -91,7 +144,7 @@ function render() {
 }
 
 function paintChips() {
-  if (!catalog) return;
+  if (!catalog || !chips) return;
   const names = categoriesFor(catalog.apps || []);
   chips.innerHTML = names
     .map(
@@ -108,7 +161,7 @@ function paintChips() {
   );
 }
 
-async function load() {
+async function loadCatalogue() {
   try {
     const response = await fetch('registry.json', { cache: 'no-cache' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -118,17 +171,26 @@ async function load() {
     return;
   }
   const apps = catalog.apps || [];
-  document.getElementById('stat-apps').textContent = apps.length;
-  document.getElementById('stat-core').textContent = apps.filter((app) => app.runtime === 'core').length;
-  document.getElementById('stat-categories').textContent = categoriesFor(apps).length - 1;
-  document.getElementById('stat-updated').textContent = catalog.updated || '—';
+  const stat = (id, value) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = value;
+  };
+  stat('stat-apps', apps.length);
+  stat('stat-core', apps.filter((app) => app.runtime === 'core').length);
+  stat('stat-categories', categoriesFor(apps).length - 1);
+  stat('stat-updated', catalog.updated || '—');
   paintChips();
   render();
 }
 
-search.addEventListener('input', () => {
-  query = search.value.trim().toLowerCase();
-  render();
-});
+/* --------------------------------- start ---------------------------------- */
 
-load();
+initChrome();
+
+if (grid && chips && search && count) {
+  search.addEventListener('input', () => {
+    query = search.value.trim().toLowerCase();
+    render();
+  });
+  loadCatalogue();
+}

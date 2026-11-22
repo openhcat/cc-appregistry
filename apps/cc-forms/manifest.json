@@ -10,5 +10,5 @@
   "entry": "web/index.html",
   "runtime": "external",
   "permissions": ["storage"],
-  "website": "https://coolcloud.odoo.com"
+  "website": "https://openhcat.github.io/cc-appregistry/"
 }
